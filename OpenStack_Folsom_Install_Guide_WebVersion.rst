@@ -59,8 +59,8 @@ Status: testing
 ====================
 
 :Node Role: NICs
-:Control Node: eth0 (192.168.100.51), eth1 (100.10.10.51)
-:Compute Node: eth0 (192.168.100.52), eth1 (100.10.10.52)
+:Control Node: em1 (10.111.80.201), em2.90 (10.222.90.201)
+:Compute Node: em1 (10.111.80.202), em2.90 (10.222.90.202)
 
 
 **Note 1:** If you are not interrested in Quantum, you can also use this guide but you must follow the nova section found `here <https://github.com/mseknibilel/OpenStack-Folsom-Install-guide/blob/master/Tricks%26Ideas/install_nova-network.rst>`_ instead of the one written in this guide.
@@ -90,8 +90,8 @@ Status: testing
 * First, take a good look at your working routing table::
    
    Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-   0.0.0.0         192.168.100.1   0.0.0.0         UG    0      0        0 eth0
-   192.168.100.0   0.0.0.0         255.255.255.0   U     0      0        0 eth0
+   0.0.0.0         192.168.100.1   0.0.0.0         UG    0      0        0 em1
+   192.168.100.0   0.0.0.0         255.255.255.0   U     0      0        0 em1
 
 * Keep in your mind that it must become like this::
    
@@ -99,23 +99,23 @@ Status: testing
    0.0.0.0         192.168.100.1   0.0.0.0         UG    0      0        0 br-ex
    192.168.100.0   0.0.0.0         255.255.255.0   U     0      0        0 br-ex
  
-* eth0 NIC on the controller node will give its IPs to the br-ex::
+* em1 NIC on the controller node will give its IPs to the br-ex::
 
-   auto eth0
-   iface eth0 inet manual
+   auto em1
+   iface em1 inet manual
    up ifconfig $IFACE 0.0.0.0 up
    up ip link set $IFACE promisc on
    down ip link set $IFACE promisc off
    down ifconfig $IFACE down
 
-   auto eth1
-   iface eth1 inet static
-   address 100.10.10.51
+   auto em2.90
+   iface em2.90 inet static
+   address 10.222.90.201
    netmask 255.255.255.0
 
    auto br-ex
    iface br-ex inet static
-   address 192.168.100.51
+   address 10.111.80.201
    netmask 255.255.255.0
    gateway 192.168.100.1
    broadcast 192.168.100.255
@@ -205,14 +205,14 @@ This is how we install OpenStack's identity service:
    export OS_TENANT_NAME=admin
    export OS_USERNAME=admin
    export OS_PASSWORD=admin_pass
-   export OS_AUTH_URL="http://192.168.100.51:5000/v2.0/"
+   export OS_AUTH_URL="http://10.111.80.201:5000/v2.0/"
    # Load it:
    source creds
 
 * To test Keystone, we use a simple curl request::
 
    apt-get install curl openssl
-   curl http://192.168.100.51:35357/v2.0/endpoints -H 'x-auth-token: ADMIN'
+   curl http://10.111.80.201:35357/v2.0/endpoints -H 'x-auth-token: ADMIN'
 
 4. Glance
 =====================================================================
@@ -232,7 +232,7 @@ This is how we install OpenStack's identity service:
 
    [filter:authtoken]
    paste.filter_factory = keystone.middleware.auth_token:filter_factory
-   auth_host = 192.168.100.51
+   auth_host = 10.111.80.201
    auth_port = 35357
    auth_protocol = http
    admin_tenant_name = service
@@ -243,7 +243,7 @@ This is how we install OpenStack's identity service:
 
    [filter:authtoken]
    paste.filter_factory = keystone.middleware.auth_token:filter_factory
-   auth_host = 192.168.100.51
+   auth_host = 10.111.80.201
    auth_port = 35357
    auth_protocol = http
    admin_tenant_name = service
@@ -299,13 +299,13 @@ This is how we install OpenStack's identity service:
    #br-int is used for VM integration.
    ovs-vsctl add-br br-int
 
-   #br-eth1 is used for VM configuration.
-   ovs-vsctl add-br br-eth1
-   ovs-vsctl add-port br-eth1 eth1
+   #br-em2.90 is used for VM configuration.
+   ovs-vsctl add-br br-em2.90
+   ovs-vsctl add-port br-em2.90 em2.90
 
    #br-ex is used for accessing internet.
    ovs-vsctl add-br br-ex
-   ovs-vsctl add-port br-ex eth0
+   ovs-vsctl add-port br-ex em1
    
 
 * **Reboot** and then re-establish your routing table::
@@ -341,7 +341,7 @@ Quantum literaly eliminated the network overhead i used to deal with during the 
    [OVS]
    tenant_network_type=vlan
    network_vlan_ranges = physnet1:1:4094
-   bridge_mappings = physnet1:br-eth1
+   bridge_mappings = physnet1:br-em2.90
 
 * Install quantum DHCP and l3 agents::
 
@@ -351,7 +351,7 @@ Quantum literaly eliminated the network overhead i used to deal with during the 
 
    [filter:authtoken]
    paste.filter_factory = keystone.middleware.auth_token:filter_factory
-   auth_host = 192.168.100.51
+   auth_host = 10.111.80.201
    auth_port = 35357
    auth_protocol = http
    admin_tenant_name = service
@@ -360,7 +360,7 @@ Quantum literaly eliminated the network overhead i used to deal with during the 
 
 * In addition, update the /etc/quantum/l3_agent.ini::
 
-   auth_url = http://192.168.100.51:35357/v2.0
+   auth_url = http://10.111.80.201:35357/v2.0
    auth_region = RegionOne
    admin_tenant_name = service
    admin_user = quantum
@@ -391,7 +391,7 @@ Quantum literaly eliminated the network overhead i used to deal with during the 
 
    [filter:authtoken]
    paste.filter_factory = keystone.middleware.auth_token:filter_factory
-   auth_host = 192.168.100.51
+   auth_host = 10.111.80.201
    auth_port = 35357
    auth_protocol = http
    admin_tenant_name = service
@@ -408,41 +408,41 @@ Quantum literaly eliminated the network overhead i used to deal with during the 
    verbose=True
    api_paste_config=/etc/nova/api-paste.ini
    scheduler_driver=nova.scheduler.simple.SimpleScheduler
-   s3_host=192.168.100.51
-   ec2_host=192.168.100.51
-   ec2_dmz_host=192.168.100.51
-   rabbit_host=192.168.100.51
-   cc_host=192.168.100.51
-   metadata_host=192.168.100.51
+   s3_host=10.111.80.201
+   ec2_host=10.111.80.201
+   ec2_dmz_host=10.111.80.201
+   rabbit_host=10.111.80.201
+   cc_host=10.111.80.201
+   metadata_host=10.111.80.201
    metadata_listen=0.0.0.0
-   nova_url=http://192.168.100.51:8774/v1.1/
+   nova_url=http://10.111.80.201:8774/v1.1/
    sql_connection=mysql://novaUser:novaPass@localhost/nova
-   ec2_url=http://192.168.100.51:8773/services/Cloud 
+   ec2_url=http://10.111.80.201:8773/services/Cloud 
    root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
 
    # Auth
    use_deprecated_auth=false
    auth_strategy=keystone
-   keystone_ec2_url=http://192.168.100.51:5000/v2.0/ec2tokens
+   keystone_ec2_url=http://10.111.80.201:5000/v2.0/ec2tokens
    # Imaging service
-   glance_api_servers=192.168.100.51:9292
+   glance_api_servers=10.111.80.201:9292
    image_service=nova.image.glance.GlanceImageService
 
    # Vnc configuration
    novnc_enabled=true
-   novncproxy_base_url=http://192.168.100.51:6080/vnc_auto.html
+   novncproxy_base_url=http://10.111.80.201:6080/vnc_auto.html
    novncproxy_port=6080
-   vncserver_proxyclient_address=192.168.100.51
+   vncserver_proxyclient_address=10.111.80.201
    vncserver_listen=0.0.0.0 
 
    # Network settings
    network_api_class=nova.network.quantumv2.api.API
-   quantum_url=http://192.168.100.51:9696
+   quantum_url=http://10.111.80.201:9696
    quantum_auth_strategy=keystone
    quantum_admin_tenant_name=service
    quantum_admin_username=quantum
    quantum_admin_password=service_pass
-   quantum_admin_auth_url=http://192.168.100.51:35357/v2.0
+   quantum_admin_auth_url=http://10.111.80.201:35357/v2.0
    libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver
    linuxnet_interface_driver=nova.network.linux_net.LinuxOVSInterfaceDriver
    firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
@@ -496,9 +496,9 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    [filter:authtoken]
    paste.filter_factory = keystone.middleware.auth_token:filter_factory
    service_protocol = http
-   service_host = 192.168.100.51
+   service_host = 10.111.80.201
    service_port = 5000
-   auth_host = 192.168.100.51
+   auth_host = 10.111.80.201
    auth_port = 35357
    auth_protocol = http
    admin_tenant_name = service
@@ -571,7 +571,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
    service apache2 restart; service memcached restart
 
-You can now access your OpenStack **192.168.100.51/horizon** with credentials **admin:admin_pass**.
+You can now access your OpenStack **10.111.80.201/horizon** with credentials **admin:admin_pass**.
 
 **Note:** A reboot might be needed for a successful login
 
@@ -593,7 +593,7 @@ You can now access your OpenStack **192.168.100.51/horizon** with credentials **
 
 * Configure the NTP server to follow the controller node::
    
-   sed -i 's/server ntp.ubuntu.com/server 192.168.100.51/g' /etc/ntp.conf
+   sed -i 's/server ntp.ubuntu.com/server 10.111.80.201/g' /etc/ntp.conf
    service ntp restart  
 
 * Install other services::
@@ -611,17 +611,17 @@ You can now access your OpenStack **192.168.100.51/horizon** with credentials **
 
 * It's recommended to have two NICs but only one needs to be internet connected::
    
-   auto eth0
-   iface eth0 inet static
-   address 192.168.100.52
+   auto em1
+   iface em1 inet static
+   address 10.111.80.202
    netmask 255.255.255.0
    gateway 192.168.100.1
    broadcast 192.168.100.255
    dns-nameservers 8.8.8.8
 
-   auto eth1
-   iface eth1 inet static
-   address 100.10.10.52
+   auto em2.90
+   iface em2.90 inet static
+   address 10.222.90.202
    netmask 255.255.255.0
 
 10.3 KVM
@@ -680,9 +680,9 @@ You can now access your OpenStack **192.168.100.51/horizon** with credentials **
    #br-int is used for VM integration	
    ovs-vsctl add-br br-int
 
-   #br-eth1 is used for VM configuration 
-   ovs-vsctl add-br br-eth1
-   ovs-vsctl add-port br-eth1 eth1
+   #br-em2.90 is used for VM configuration 
+   ovs-vsctl add-br br-em2.90
+   ovs-vsctl add-port br-em2.90 em2.90
 
 10.5. Quantum
 ------------------
@@ -697,17 +697,17 @@ We don't need to install the hole quantum server here, just the openVSwitch plug
 
    #Under the database section
    [DATABASE]
-   sql_connection = mysql://quantumUser:quantumPass@192.168.100.51/quantum
+   sql_connection = mysql://quantumUser:quantumPass@10.111.80.201/quantum
 
    #Under the OVS section
    [OVS]
    tenant_network_type=vlan
    network_vlan_ranges = physnet1:1:4094
-   bridge_mappings = physnet1:br-eth1
+   bridge_mappings = physnet1:br-em2.90
 
 * Make sure that your rabbitMQ IP in /etc/quantum/quantum.conf is set to the controller node::
    
-   rabbit_host = 192.168.100.51
+   rabbit_host = 10.111.80.201
 
 * Restart all the services::
 
@@ -724,7 +724,7 @@ We don't need to install the hole quantum server here, just the openVSwitch plug
 
    [filter:authtoken]
    paste.filter_factory = keystone.middleware.auth_token:filter_factory
-   auth_host = 192.168.100.51
+   auth_host = 10.111.80.201
    auth_port = 35357
    auth_protocol = http
    admin_tenant_name = service
@@ -750,41 +750,41 @@ We don't need to install the hole quantum server here, just the openVSwitch plug
    verbose=True
    api_paste_config=/etc/nova/api-paste.ini
    scheduler_driver=nova.scheduler.simple.SimpleScheduler
-   s3_host=192.168.100.51
-   ec2_host=192.168.100.51
-   ec2_dmz_host=192.168.100.51
-   rabbit_host=192.168.100.51
-   cc_host=192.168.100.51
-   metadata_host=192.168.100.52
+   s3_host=10.111.80.201
+   ec2_host=10.111.80.201
+   ec2_dmz_host=10.111.80.201
+   rabbit_host=10.111.80.201
+   cc_host=10.111.80.201
+   metadata_host=10.111.80.202
    metadata_listen=0.0.0.0
-   nova_url=http://192.168.100.51:8774/v1.1/
-   sql_connection=mysql://novaUser:novaPass@192.168.100.51/nova
-   ec2_url=http://192.168.100.51:8773/services/Cloud 
+   nova_url=http://10.111.80.201:8774/v1.1/
+   sql_connection=mysql://novaUser:novaPass@10.111.80.201/nova
+   ec2_url=http://10.111.80.201:8773/services/Cloud 
    root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
    
    # Auth
    use_deprecated_auth=false
    auth_strategy=keystone
-   keystone_ec2_url=http://192.168.100.51:5000/v2.0/ec2tokens
+   keystone_ec2_url=http://10.111.80.201:5000/v2.0/ec2tokens
    # Imaging service
-   glance_api_servers=192.168.100.51:9292
+   glance_api_servers=10.111.80.201:9292
    image_service=nova.image.glance.GlanceImageService
 
    # Vnc configuration
    novnc_enabled=true
-   novncproxy_base_url=http://192.168.100.51:6080/vnc_auto.html
+   novncproxy_base_url=http://10.111.80.201:6080/vnc_auto.html
    novncproxy_port=6080
-   vncserver_proxyclient_address=192.168.100.52
+   vncserver_proxyclient_address=10.111.80.202
    vncserver_listen=0.0.0.0 
 
    # Network settings
    network_api_class=nova.network.quantumv2.api.API
-   quantum_url=http://192.168.100.51:9696
+   quantum_url=http://10.111.80.201:9696
    quantum_auth_strategy=keystone
    quantum_admin_tenant_name=service
    quantum_admin_username=quantum
    quantum_admin_password=service_pass
-   quantum_admin_auth_url=http://192.168.100.51:35357/v2.0
+   quantum_admin_auth_url=http://10.111.80.201:35357/v2.0
    libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver
    linuxnet_interface_driver=nova.network.linux_net.LinuxOVSInterfaceDriver
    firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
