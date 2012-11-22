@@ -90,14 +90,14 @@ Status: testing
 * First, take a good look at your working routing table::
    
    Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-   0.0.0.0         192.168.100.1   0.0.0.0         UG    0      0        0 em1
-   192.168.100.0   0.0.0.0         255.255.255.0   U     0      0        0 em1
+   0.0.0.0         10.111.80.254   0.0.0.0         UG    0      0        0 em1
+   10.111.80.0   0.0.0.0         255.255.255.0   U     0      0        0 em1
 
 * Keep in your mind that it must become like this::
    
    Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-   0.0.0.0         192.168.100.1   0.0.0.0         UG    0      0        0 br-ex
-   192.168.100.0   0.0.0.0         255.255.255.0   U     0      0        0 br-ex
+   0.0.0.0         10.111.80.254   0.0.0.0         UG    0      0        0 br-ex
+   10.111.80.0   0.0.0.0         255.255.255.0   U     0      0        0 br-ex
  
 * em1 NIC on the controller node will give its IPs to the br-ex::
 
@@ -117,8 +117,7 @@ Status: testing
    iface br-ex inet static
    address 10.111.80.201
    netmask 255.255.255.0
-   gateway 192.168.100.1
-   broadcast 192.168.100.255
+   gateway 10.111.80.254
    dns-nameservers 8.8.8.8
 
 
@@ -310,7 +309,7 @@ This is how we install OpenStack's identity service:
 
 * **Reboot** and then re-establish your routing table::
 
-   route add default gw 192.168.100.1 br-ex
+   route add default gw 10.111.80.254 br-ex
 
    #If there are other gateways, you must delete them using
    #route del default gw %gateway_address dev <interface>
@@ -615,8 +614,7 @@ You can now access your OpenStack **10.111.80.201/horizon** with credentials **a
    iface em1 inet static
    address 10.111.80.202
    netmask 255.255.255.0
-   gateway 192.168.100.1
-   broadcast 192.168.100.255
+   gateway 10.111.80.254
    dns-nameservers 8.8.8.8
 
    auto em2.90
@@ -842,7 +840,7 @@ You can now start creating VMs but they will not be accessible from the internet
 
 * Create a subnet containing your floating IPs::
 
-   quantum subnet-create --tenant-id $put_id_of_service_tenant --gateway 192.168.100.1 ext_net 192.168.100.232/28 --enable_dhcp=False
+   quantum subnet-create --tenant-id $put_id_of_service_tenant --gateway 10.111.80.254 ext_net 192.168.100.232/28 --enable_dhcp=False
 
 * Set the router for the external network::
 
