@@ -90,35 +90,39 @@ Status: testing
 * First, take a good look at your working routing table::
    
    Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-   0.0.0.0         10.111.80.254   0.0.0.0         UG    0      0        0 em1
-   10.111.80.0   0.0.0.0         255.255.255.0   U     0      0        0 em1
+   0.0.0.0         10.222.90.254   0.0.0.0         UG    0      0        0 em2.90
+   10.111.80.0     0.0.0.0         255.255.255.0   U     0      0        0 em1
+   10.222.90.0     0.0.0.0         255.255.255.0   U     0      0        0 em2.90
+
 
 * Keep in your mind that it must become like this::
    
-   Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-   0.0.0.0         10.111.80.254   0.0.0.0         UG    0      0        0 br-ex
-   10.111.80.0   0.0.0.0         255.255.255.0   U     0      0        0 br-ex
+   Destination   Gateway         Genmask         Flags Metric Ref    Use Iface
+   0.0.0.0       10.222.90.254   0.0.0.0         UG    0      0        0 br-ex
+   10.222.90.0   0.0.0.0         255.255.255.0   U     0      0        0 br-ex
+   10.111.80.0   0.0.0.0         255.255.255.0   U     0      0        0 em1
  
-* em1 NIC on the controller node will give its IPs to the br-ex::
+* em2 NIC on the controller node will give its IPs to the br-ex::
 
    auto em1
-   iface em1 inet manual
+   iface em1 inet static
+   address 10.111.80.201
+   netmask 255.255.255.0
+
+   auto em2
+   iface em2 inet manual
    up ifconfig $IFACE 0.0.0.0 up
    up ip link set $IFACE promisc on
    down ip link set $IFACE promisc off
    down ifconfig $IFACE down
 
-   auto em2.90
-   iface em2.90 inet static
-   address 10.222.90.201
-   netmask 255.255.255.0
-
    auto br-ex
    iface br-ex inet static
-   address 10.111.80.201
+   address 10.222.90.201
    netmask 255.255.255.0
-   gateway 10.111.80.254
+   gateway 10.222.90.254
    dns-nameservers 8.8.8.8
+   dns-nameservers 8.8.4.4
 
 
 2.3. MySQL & RabbitMQ
@@ -299,17 +303,17 @@ This is how we install OpenStack's identity service:
    ovs-vsctl add-br br-int
 
    #br-em2.90 is used for VM configuration.
-   ovs-vsctl add-br br-em2.90
-   ovs-vsctl add-port br-em2.90 em2.90
+   ovs-vsctl add-br br
+   ovs-vsctl add-port br-em1 em1
 
    #br-ex is used for accessing internet.
    ovs-vsctl add-br br-ex
-   ovs-vsctl add-port br-ex em1
+   ovs-vsctl add-port br-ex em2.90
    
 
 * **Reboot** and then re-establish your routing table::
 
-   route add default gw 10.111.80.254 br-ex
+   route add default gw 10.222.90.254 br-ex
 
    #If there are other gateways, you must delete them using
    #route del default gw %gateway_address dev <interface>
@@ -614,13 +618,13 @@ You can now access your OpenStack **10.111.80.201/horizon** with credentials **a
    iface em1 inet static
    address 10.111.80.202
    netmask 255.255.255.0
-   gateway 10.111.80.254
    dns-nameservers 8.8.8.8
 
    auto em2.90
    iface em2.90 inet static
    address 10.222.90.202
    netmask 255.255.255.0
+   gateway 10.222.90.254
 
 10.3 KVM
 ------------------
