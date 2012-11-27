@@ -302,7 +302,7 @@ This is how we install OpenStack's identity service:
    #br-int is used for VM integration.
    ovs-vsctl add-br br-int
 
-   #br-em2.90 is used for VM configuration.
+   #br-em1 is used for VM configuration.
    ovs-vsctl add-br br
    ovs-vsctl add-port br-em1 em1
 
