@@ -109,15 +109,15 @@ Status: testing
    address 10.111.80.201
    netmask 255.255.255.0
 
-   auto em2
-   iface em2 inet manual
+   auto em2.90
+   iface em2.90 inet manual
    up ifconfig $IFACE 0.0.0.0 up
    up ip link set $IFACE promisc on
    down ip link set $IFACE promisc off
    down ifconfig $IFACE down
 
-   auto br-ex
-   iface br-ex inet static
+   auto br-ex.90
+   iface br-ex.90 inet static
    address 10.222.90.201
    netmask 255.255.255.0
    gateway 10.222.90.254
@@ -307,13 +307,13 @@ This is how we install OpenStack's identity service:
    ovs-vsctl add-port br-em1 em1
 
    #br-ex is used for accessing internet.
-   ovs-vsctl add-br br-ex
-   ovs-vsctl add-port br-ex em2.90
+   ovs-vsctl add-br br-ex.90
+   ovs-vsctl add-port br-ex.90 em2.90
    
 
 * **Reboot** and then re-establish your routing table::
 
-   route add default gw 10.222.90.254 br-ex
+   route add default gw 10.222.90.254 br-ex.90
 
    #If there are other gateways, you must delete them using
    #route del default gw %gateway_address dev <interface>
