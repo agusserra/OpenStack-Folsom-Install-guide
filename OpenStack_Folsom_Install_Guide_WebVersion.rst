@@ -495,10 +495,10 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    service cinder-volume restart
    service cinder-api restart
 
-10. Adding a compute node
+7. Adding a compute node
 =========================
 
-10.1. Preparing the Node
+7.1. Preparing the Node
 ------------------
 
 * Update your system::
@@ -532,7 +532,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    iptables -t nat -A POSTROUTING -o em2.90 -j MASQUERADE
    exit 0
 
-10.2.Networking
+7.2.Networking
 ------------
 
 * It's recommended to have two NICs but only one (em2.90) needs to be internet connected::
@@ -549,7 +549,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    netmask 255.255.255.0
    gateway 10.222.90.254
 
-10.3 KVM
+7.3 KVM
 ------------------
 
 * KVM is needed as the hypervisor that will be used to create virtual machines.
@@ -572,7 +572,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
    service libvirt-bin restart
 
-10.6. Nova
+7.4. Nova
 ------------------
 
 * Install nova's required components for the compute node::
@@ -664,7 +664,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
    nova-manage service list
 
-11. Your First VM
+8. Your First VM
 ============
 
 To start your first VM::
@@ -673,7 +673,7 @@ To start your first VM::
 
 I Hope you enjoyed this guide, please if you have any feedbacks, don't hesitate.
 
-12. Licensing
+9. Licensing
 ============
 
 OpenStack Folsom Install Guide by Bilel Msekni is licensed under a Creative Commons Attribution 3.0 Unported License.
@@ -681,12 +681,12 @@ OpenStack Folsom Install Guide by Bilel Msekni is licensed under a Creative Comm
 .. image:: http://i.imgur.com/4XWrp.png
 To view a copy of this license, visit [ http://creativecommons.org/licenses/by/3.0/deed.en_US ].
 
-13. Contacts
+10. Contacts
 ===========
 
 Bilel Msekni: bilel.msekni@telecom-sudparis.eu
 
-14. Acknowledgment
+11. Acknowledgment
 =================
 
 This work has been supported by:
@@ -694,7 +694,7 @@ This work has been supported by:
 * CompatibleOne Project (French FUI project) [http://compatibleone.org/]
 * Easi-Clouds (ITEA2 project) [http://easi-clouds.eu/]
 
-15. Credits
+12. Credits
 =================
 
 This work has been based on:
@@ -703,7 +703,7 @@ This work has been based on:
 * OpenStack Documentation [http://docs.openstack.org/trunk/openstack-compute/install/apt/content/]
 * OpenStack Quantum Install [http://docs.openstack.org/trunk/openstack-network/admin/content/ch_install.html]
 
-16. To do
+13. To do
 =======
 
 This guide is under testing. Your suggestions are always welcomed.
@@ -711,7 +711,3 @@ This guide is under testing. Your suggestions are always welcomed.
 Some of this guide's needs might be:
 
 * Define more Quantum configurations to cover all usecases possible see `here <http://docs.openstack.org/trunk/openstack-network/admin/content/use_cases.html>`_. 
-
-
-
-
