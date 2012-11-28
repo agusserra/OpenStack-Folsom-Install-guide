@@ -416,6 +416,11 @@ This is how we install OpenStack's identity service:
 
     nova floating-ip-create
 
+* Add ICMP ping and SSH access to the default group::
+
+    nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
+    nova secgroup-add-rule default tcp 22 22 0.0.0.0/0
+
 6. Cinder
 =================
 
