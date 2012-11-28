@@ -659,7 +659,9 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 8. Your First VM
 ============
 
-To start your first VM::
+To start your first VM:
+
+* Run a glance image-list first to find the UUID from the image to boot::
 
     nova boot --image deb3fd68-ff77-4994-881b-361d4142639e --flavor m1.tiny test
 
