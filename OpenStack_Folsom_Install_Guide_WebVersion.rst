@@ -90,14 +90,6 @@ Status: testing
    0.0.0.0         10.222.90.254   0.0.0.0         UG    0      0        0 em2.90
    10.111.80.0     0.0.0.0         255.255.255.0   U     0      0        0 em1
    10.222.90.0     0.0.0.0         255.255.255.0   U     0      0        0 em2.90
-
-
-* Keep in your mind that it must become like this::
-   
-   Destination   Gateway         Genmask         Flags Metric Ref    Use Iface
-   0.0.0.0       10.222.90.254   0.0.0.0         UG    0      0        0 br-ex
-   10.222.90.0   0.0.0.0         255.255.255.0   U     0      0        0 br-ex
-   10.111.80.0   0.0.0.0         255.255.255.0   U     0      0        0 em1
  
 * /etc/network/interfaces::
 
@@ -111,8 +103,8 @@ Status: testing
    network 10.111.80.0
    broadcast 10.111.80.255
   
-   auto em2
-   iface em2 inet static
+   auto em2.90
+   iface em2.90 inet static
    address 10.222.90.201
    netmask 255.255.255.0
    gateway 10.222.90.254
@@ -155,9 +147,11 @@ Status: testing
 
 * Enable IP_Forwarding::
 
-   nano /etc/sysctl.conf
-   # Uncomment net.ipv4.ip_forward=1, to save you from rebooting, do this:
-   sysctl net.ipv4.ip_forward=1
+   sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf 
+
+* Add 8021q to /etc/modules::
+
+   echo "8021q" >> /etc/modules
 
 
 3. Keystone
