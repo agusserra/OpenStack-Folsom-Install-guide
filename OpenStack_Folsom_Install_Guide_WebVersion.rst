@@ -683,13 +683,12 @@ To view a copy of this license, visit [ http://creativecommons.org/licenses/by/3
 
 Bilel Msekni: bilel.msekni@telecom-sudparis.eu
 
-11. Acknowledgment
+11. References
 =================
 
-This work has been supported by:
+* Configuring Floating IP addresses [http://www.mirantis.com/blog/configuring-floating-ip-addresses-networking-openstack-public-private-clouds/]
+* Enabling Ping and SSH on VMs [http://docs.openstack.org/trunk/openstack-compute/admin/content/enabling-ping-and-ssh-on-vms.html]
 
-* CompatibleOne Project (French FUI project) [http://compatibleone.org/]
-* Easi-Clouds (ITEA2 project) [http://easi-clouds.eu/]
 
 12. Credits
 =================
