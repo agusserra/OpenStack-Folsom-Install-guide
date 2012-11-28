@@ -2,7 +2,7 @@
   OpenStack Folsom Install Guide
 ==========================================================
 
-:Version: 3.0
+:Version: 1.0
 :Source: https://github.com/mseknibilel/OpenStack-Folsom-Install-guide
 :Keywords: Multi node OpenStack, Folsom, Nova, Nova-Network, Keystone, Glance, Cinder, KVM, Ubuntu Server 12.10 (64 bits).
 
@@ -47,7 +47,7 @@ Table of Contents
 
 OpenStack Folsom Install Guide is an easy and tested way to create your own OpenStack plateform. 
 
-Version 3.0
+Version 1.0
 
 Status: testing 
 
@@ -59,10 +59,7 @@ Status: testing
 :Control Node: em1 (10.111.80.201), em2.90 (10.222.90.201)
 :Compute Node: em1 (10.111.80.202), em2.90 (10.222.90.202)
 
-
-**Note 1:** If you are not interrested in Quantum, you can also use this guide but you must follow the nova section found `here <https://github.com/mseknibilel/OpenStack-Folsom-Install-guide/blob/master/Tricks%26Ideas/install_nova-network.rst>`_ instead of the one written in this guide.
-
-**Note 2:** This is my current network architecture, you can add as many compute node as you wish.
+**Note 1:** This is my current network architecture, you can add as many compute node as you wish.
 
 .. image:: http://i.imgur.com/RK6X7.jpg
 
@@ -100,8 +97,6 @@ Status: testing
    iface em1 inet static
    address 10.111.80.201
    netmask 255.255.255.0
-   network 10.111.80.0
-   broadcast 10.111.80.255
   
    auto em2.90
    iface em2.90 inet static
@@ -416,7 +411,7 @@ This is how we install OpenStack's identity service:
 
     nova floating-ip-create
 
-* Add ICMP ping and SSH access to the default group::
+* Add ICMP ping and SSH access to the default security group::
 
     nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
     nova secgroup-add-rule default tcp 22 22 0.0.0.0/0
