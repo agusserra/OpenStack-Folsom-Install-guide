@@ -570,11 +570,6 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    "/dev/rtc", "/dev/hpet","/dev/net/tun"
    ]
 
-* Delete default virtual bridge ::
-
-   virsh net-destroy default
-   virsh net-undefine default
-
 * Enable live migration by updating /etc/libvirt/libvirtd.conf file::
 
    listen_tls = 0
@@ -623,58 +618,68 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
 * Modify the /etc/nova/nova.conf like this::
 
-   [DEFAULT]
-   logdir=/var/log/nova
-   state_path=/var/lib/nova
-   lock_path=/run/lock/nova
-   verbose=True
-   api_paste_config=/etc/nova/api-paste.ini
-   scheduler_driver=nova.scheduler.simple.SimpleScheduler
-   s3_host=10.111.80.201
-   ec2_host=10.111.80.201
-   ec2_dmz_host=10.111.80.201
-   rabbit_host=10.111.80.201
-   cc_host=10.111.80.201
-   metadata_host=10.111.80.202
-   metadata_listen=0.0.0.0
-   nova_url=http://10.111.80.201:8774/v1.1/
-   sql_connection=mysql://novaUser:novaPass@10.111.80.201/nova
-   ec2_url=http://10.111.80.201:8773/services/Cloud 
-   root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
-   
-   # Auth
-   use_deprecated_auth=false
-   auth_strategy=keystone
-   keystone_ec2_url=http://10.111.80.201:5000/v2.0/ec2tokens
-   # Imaging service
-   glance_api_servers=10.111.80.201:9292
-   image_service=nova.image.glance.GlanceImageService
-
-   # Vnc configuration
-   novnc_enabled=true
-   novncproxy_base_url=http://10.111.80.201:6080/vnc_auto.html
-   novncproxy_port=6080
-   vncserver_proxyclient_address=10.111.80.202
-   vncserver_listen=0.0.0.0 
-
-   # Network settings
-   network_api_class=nova.network.quantumv2.api.API
-   quantum_url=http://10.111.80.201:9696
-   quantum_auth_strategy=keystone
-   quantum_admin_tenant_name=service
-   quantum_admin_username=quantum
-   quantum_admin_password=service_pass
-   quantum_admin_auth_url=http://10.111.80.201:35357/v2.0
-   libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver
-   linuxnet_interface_driver=nova.network.linux_net.LinuxOVSInterfaceDriver
-   firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
-
-   # Compute #
-   compute_driver=libvirt.LibvirtDriver
-
-   # Cinder #
-   volume_api_class=nova.volume.cinder.API
-   osapi_volume_listen_port=5900
+    [DEFAULT]
+    
+    # LOGS/STATE
+    verbose=True
+    logdir=/var/log/nova
+    state_path=/var/lib/nova
+    lock_path=/run/lock/nova
+    
+    # AUTHENTICATION
+    auth_strategy=keystone
+    
+    # SCHEDULER
+    scheduler_driver=nova.scheduler.multi.MultiScheduler
+    compute_scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
+    
+    # CINDER
+    volume_api_class=nova.volume.cinder.API
+    
+    # DATABASE
+    sql_connection=mysql://novaUser:novaPass@10.111.80.201/nova
+    
+    # COMPUTE
+    libvirt_type=kvm
+    libvirt_use_virtio_for_bridges=True
+    start_guests_on_host_boot=True
+    resume_guests_state_on_host_boot=True
+    api_paste_config=/etc/nova/api-paste.ini
+    allow_admin_api=True
+    use_deprecated_auth=False
+    nova_url=http://10.111.80.201:8774/v1.1/
+    root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
+    
+    # APIS
+    ec2_host=10.111.80.201
+    ec2_url=http://10.111.80.201:8773/services/Cloud
+    keystone_ec2_url=http://10.111.80.201:5000/v2.0/ec2tokens
+    s3_host=10.111.80.201
+    cc_host=10.111.80.201
+    metadata_host=10.111.80.203
+    
+    # RABBITMQ
+    rabbit_host=10.111.80.201
+    
+    # GLANCE
+    image_service=nova.image.glance.GlanceImageService
+    glance_api_servers=10.111.80.201:9292
+    
+    # NETWORK
+    network_manager=nova.network.manager.FlatDHCPManager
+    force_dhcp_release=True
+    dhcpbridge_flagfile=/etc/nova/nova.conf
+    dhcpbridge=/usr/bin/nova-dhcpbridge
+    firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
+    public_interface=em2.90
+    flat_interface=em1
+    flat_network_bridge=br100
+    fixed_range=192.168.6.0/24
+    network_size=256
+    flat_network_dhcp_start=192.168.6.0
+    flat_injected=False
+    connection_type=libvirt
+    multi_host=True
 
 * Restart nova-* services::
 
