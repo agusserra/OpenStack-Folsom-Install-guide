@@ -74,77 +74,71 @@ First make sure that your hardware meets these requirements:
 
 
 * Change your /etc/nova/nova.conf to look like this::
-   
-   [DEFAULT]
 
-   # LOGS/STATE
-   verbose=True
-   logdir=/var/log/nova
-   state_path=/var/lib/nova
-   lock_path=/run/lock/nova
-
-   # AUTHENTICATION
-   auth_strategy=keystone
-
-   # SCHEDULER
-   scheduler_driver=nova.scheduler.multi.MultiScheduler
-   compute_scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
-
-   # CINDER
-   volume_api_class=nova.volume.cinder.API
-
-   # DATABASE
-   sql_connection=mysql://novaUser:novaPass@10.111.80.201/nova
-
-   # COMPUTE
-   libvirt_type=kvm
-   libvirt_use_virtio_for_bridges=True
-   start_guests_on_host_boot=True
-   resume_guests_state_on_host_boot=True
-   api_paste_config=/etc/nova/api-paste.ini
-   allow_admin_api=True
-   use_deprecated_auth=False
-   nova_url=http://10.111.80.201:8774/v1.1/
-   root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
-
-   # APIS
-   ec2_host=10.111.80.201
-   ec2_url=http://10.111.80.201:8773/services/Cloud
-   keystone_ec2_url=http://10.111.80.201:5000/v2.0/ec2tokens
-   s3_host=10.111.80.201
-   cc_host=10.111.80.201
-   metadata_host=10.111.80.201
-   #metadata_listen=0.0.0.0
-   enabled_apis=ec2,osapi_compute,metadata
-
-   # RABBITMQ
-   rabbit_host=10.111.80.201
-
-   # GLANCE
-   image_service=nova.image.glance.GlanceImageService
-   glance_api_servers=10.111.80.201:9292
-
-   # NETWORK
-   network_manager=nova.network.manager.FlatDHCPManager
-   force_dhcp_release=True
-   dhcpbridge_flagfile=/etc/nova/nova.conf
-   dhcpbridge=/usr/bin/nova-dhcpbridge
-   firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
-   public_interface=em2
-   flat_interface=em1
-   flat_network_bridge=br100
-   fixed_range=10.111.80.129/25
-   network_size=128
-   flat_network_dhcp_start=10.111.80.129
-   flat_injected=False
-   connection_type=libvirt
-   multi_host=True
-
-   # NOVNC CONSOLE
-   novnc_enabled=True
-   novncproxy_base_url=http://10.111.80.201:6080/vnc_auto.html
-   vncserver_proxyclient_address=10.111.80.201
-   vncserver_listen=10.111.80.201
+    [DEFAULT]
+    
+    # LOGS/STATE
+    verbose=True
+    logdir=/var/log/nova
+    state_path=/var/lib/nova
+    lock_path=/run/lock/nova
+    
+    # AUTHENTICATION
+    auth_strategy=keystone
+    
+    # SCHEDULER
+    scheduler_driver=nova.scheduler.multi.MultiScheduler
+    compute_scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
+    
+    # CINDER
+    volume_api_class=nova.volume.cinder.API
+    
+    # DATABASE
+    sql_connection=mysql://novaUser:novaPass@10.111.80.201/nova
+    
+    # COMPUTE
+    libvirt_type=kvm
+    libvirt_use_virtio_for_bridges=True
+    start_guests_on_host_boot=True
+    resume_guests_state_on_host_boot=True
+    api_paste_config=/etc/nova/api-paste.ini
+    allow_admin_api=True
+    use_deprecated_auth=False
+    nova_url=http://10.111.80.201:8774/v1.1/
+    root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
+    
+    # APIS
+    ec2_host=10.111.80.201
+    ec2_url=http://10.111.80.201:8773/services/Cloud
+    keystone_ec2_url=http://10.111.80.201:5000/v2.0/ec2tokens
+    s3_host=10.111.80.201
+    cc_host=10.111.80.201
+    metadata_host=10.111.80.201
+    #metadata_listen=0.0.0.0
+    enabled_apis=ec2,osapi_compute,metadata
+    
+    # RABBITMQ
+    rabbit_host=10.111.80.201
+    
+    # GLANCE
+    image_service=nova.image.glance.GlanceImageService
+    glance_api_servers=10.111.80.201:9292
+    
+    # NETWORK
+    network_manager=nova.network.manager.FlatDHCPManager
+    force_dhcp_release=True
+    dhcpbridge_flagfile=/etc/nova/nova.conf
+    dhcpbridge=/usr/bin/nova-dhcpbridge
+    firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
+    public_interface=em2
+    flat_interface=em1
+    flat_network_bridge=br100
+    fixed_range=192.168.6.0/24
+    network_size=256
+    flat_network_dhcp_start=192.168.6.0
+    flat_injected=False
+    connection_type=libvirt
+    multi_host=True
 
 * Don't forget to update the ownership rights of the nova directory::
 
@@ -171,11 +165,11 @@ First make sure that your hardware meets these requirements:
 
 * Use the following command to create fixed network::
    
-   nova-manage network create private --fixed_range_v4=10.0.1.129/25 --num_networks=1 --bridge=br100 --bridge_interface=em1 --network_size=128 --multi_host=T
+   nova-manage network create private --fixed_range_v4=192.168.6.0/24 --num_networks=1 --bridge=br100 --bridge_interface=em1 --network_size=256 --multi_host=T
 
 * Create the floating IPs::
 
-   nova-manage floating create --ip_range=192.168.1.201
+   nova-manage floating create --ip_range=10.222.90.128/26
 
 1.1. The compute node:
 -----------------
