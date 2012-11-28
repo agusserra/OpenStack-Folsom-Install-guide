@@ -32,18 +32,15 @@ Table of Contents
   2. Getting Ready
   3. Keystone 
   4. Glance
-  5. OpenVSwitch
-  6. Quantum
-  7. Nova
-  8. Cinder
-  9. Horizon
-  10. Adding a compute node
-  11. Start your first VM
-  12. Licencing
-  13. Contacts
-  14. Acknowledgement
-  15. Credits
-  16. To do
+  5. Nova
+  6. Cinder
+  7. Adding a compute node
+  8. Start your first VM
+  9. Licencing
+  10. Contacts
+  11. Acknowledgement
+  12. Credits
+  13. To do
 
 0. What is it?
 ==============
@@ -287,93 +284,7 @@ This is how we install OpenStack's identity service:
 
    glance image-list
 
-5. OpenVSwitch
-=====================================================================
-
-* Install the openVSwitch::
-
-   apt-get install -y openvswitch-switch openvswitch-datapath-dkms
-
-* Create the bridges::
-
-   #br-int is used for VM integration.
-   ovs-vsctl add-br br-int
-
-   #br-em1 is used for VM configuration.
-   ovs-vsctl add-br br
-   ovs-vsctl add-port br-em1 em1
-
-   #br-ex is used for accessing internet.
-   ovs-vsctl add-br br-ex.90
-   ovs-vsctl add-port br-ex.90 em2.90
-   
-
-* **Reboot** and then re-establish your routing table::
-
-   route add default gw 10.222.90.254 br-ex.90
-
-   #If there are other gateways, you must delete them using
-   #route del default gw %gateway_address dev <interface>
-
-6. Quantum
-=====================================================================
-
-Quantum literaly eliminated the network overhead i used to deal with during the nova-network era.
-
-* Install the Quantum server and the OpenVSwitch package collection::
-
-   apt-get install quantum-server quantum-plugin-openvswitch quantum-plugin-openvswitch-agent
-
-* Create a database::
-
-   mysql -u root -p
-   CREATE DATABASE quantum;
-   GRANT ALL ON quantum.* TO 'quantumUser'@'%' IDENTIFIED BY 'quantumPass';
-   quit; 
-
-* Edit the OVS plugin configuration file /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini with:: 
-
-   #Under the database section
-   [DATABASE]
-   sql_connection = mysql://quantumUser:quantumPass@localhost/quantum
-
-   #Under the OVS section
-   [OVS]
-   tenant_network_type=vlan
-   network_vlan_ranges = physnet1:1:4094
-   bridge_mappings = physnet1:br-em2.90
-
-* Install quantum DHCP and l3 agents::
-
-   apt-get -y install quantum-dhcp-agent quantum-l3-agent
-
-* Edit /etc/quantum/api-paste.ini ::
-
-   [filter:authtoken]
-   paste.filter_factory = keystone.middleware.auth_token:filter_factory
-   auth_host = 10.111.80.201
-   auth_port = 35357
-   auth_protocol = http
-   admin_tenant_name = service
-   admin_user = quantum
-   admin_password = service_pass
-
-* In addition, update the /etc/quantum/l3_agent.ini::
-
-   auth_url = http://10.111.80.201:35357/v2.0
-   auth_region = RegionOne
-   admin_tenant_name = service
-   admin_user = quantum
-   admin_password = service_pass
-
-* Restart all the services::
-
-   service quantum-server restart
-   service quantum-dhcp-agent restart
-   service quantum-l3-agent restart
-   service quantum-plugin-openvswitch-agent restart
-
-7. Nova
+5. Nova
 =================
 
 * Start by installing nova components::
@@ -466,7 +377,7 @@ Quantum literaly eliminated the network overhead i used to deal with during the 
 
    nova-manage service list
 
-8. Cinder
+6. Cinder
 =================
 
 Although Cinder is a replacement of the old nova-volume service, its installation is now a seperated from the nova install process.
@@ -548,32 +459,6 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
    service cinder-volume restart
    service cinder-api restart
-
-9. Horizon
-============
-
-* To install horizon, proceed like this ::
-
-   apt-get install openstack-dashboard memcached
-
-
-* If you don't like the OpenStack ubuntu theme, you can disabled it and go back to the default look::
-
-   nano /etc/openstack-dashboard/local_settings.py
-   #Comment these lines
-   #Enable the Ubuntu theme if it is present.
-   #try:
-   #    from ubuntu_theme import *
-   #except ImportError:
-   #    pass
-
-* Reload Apache and memcached::
-
-   service apache2 restart; service memcached restart
-
-You can now access your OpenStack **10.111.80.201/horizon** with credentials **admin:admin_pass**.
-
-**Note:** A reboot might be needed for a successful login
 
 10. Adding a compute node
 =========================
