@@ -412,6 +412,10 @@ This is how we install OpenStack's identity service:
 
    nova-manage floating create --ip_range=10.222.90.128/26
 
+* Create the floating to the nova project, run the next command many times your network IPs::
+
+    nova floating-ip-create
+
 6. Cinder
 =================
 
