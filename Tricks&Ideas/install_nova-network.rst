@@ -46,7 +46,7 @@ First make sure that your hardware meets these requirements:
 * Add this script to /etc/network/if-pre-up.d/iptablesload to forward traffic to em2::
 
    #!/bin/sh
-   iptables -t nat -A POSTROUTING -o em2 -j MASQUERADE
+   iptables -t nat -A POSTROUTING -o em2.90 -j MASQUERADE
    exit 0
 
 * Install these packages::
