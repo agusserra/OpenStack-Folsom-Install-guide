@@ -102,29 +102,25 @@ Status: testing
    10.222.90.0   0.0.0.0         255.255.255.0   U     0      0        0 br-ex
    10.111.80.0   0.0.0.0         255.255.255.0   U     0      0        0 em1
  
-* /etc/network/interfaces 
+* /etc/network/interfaces::
 
-# The loopback network interface
-auto lo
-iface lo inet loopback
-
-# The primary network interface
-auto em1
-iface em1 inet static
-address 10.111.80.201
-netmask 255.255.255.0
-network 10.111.80.0
-broadcast 10.111.80.255
-# dns-* options are implemented by the resolvconf package, if installed
-dns-nameservers 8.8.8.8 8.8.4.4
-dns-search despexds.net
-
-auto em2
-iface em2 inet static
-address 10.222.90.201
-netmask 255.255.255.0
-gateway 10.222.90.254
-
+   auto lo
+   iface lo inet loopback
+ 
+   auto em1
+   iface em1 inet static
+   address 10.111.80.201
+   netmask 255.255.255.0
+   network 10.111.80.0
+   broadcast 10.111.80.255
+  
+   auto em2
+   iface em2 inet static
+   address 10.222.90.201
+   netmask 255.255.255.0
+   gateway 10.222.90.254
+   dns-nameservers 8.8.8.8 8.8.4.4
+   dns-search despexds.net
 
 2.3. MySQL & RabbitMQ
 ------------
