@@ -695,6 +695,7 @@ This work has been based on:
 * Emilien Macchi's Folsom guide [https://github.com/EmilienM/openstack-folsom-guide]
 * OpenStack Documentation [http://docs.openstack.org/trunk/openstack-compute/install/apt/content/]
 * OpenStack Quantum Install [http://docs.openstack.org/trunk/openstack-network/admin/content/ch_install.html]
+* Vlan configuration [https://wiki.ubuntu.com/vlan]
 
 13. To do
 =======
