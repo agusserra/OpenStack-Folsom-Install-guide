@@ -1,9 +1,7 @@
 OpenStack-Folsom-Install-guide
 ==============================
 
-
 ![ScreenShot](http://i.imgur.com/hyeAT.jpg)
-
 
 **Note:** Folsom + Nova Network on VLAN with 2 NICS:
 
