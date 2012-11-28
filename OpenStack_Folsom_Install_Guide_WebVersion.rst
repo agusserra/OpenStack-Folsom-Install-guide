@@ -591,15 +591,6 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    admin_password = service_pass
    signing_dirname = /tmp/keystone-signing-nova
 
-* Edit /etc/nova/nova-compute.conf file ::
-   
-   [DEFAULT]
-   libvirt_type=kvm
-   libvirt_ovs_bridge=br-int
-   libvirt_vif_type=ethernet
-   libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver
-   libvirt_use_virtio_for_bridges=True
-
 * Modify the /etc/nova/nova.conf like this::
 
     [DEFAULT]
