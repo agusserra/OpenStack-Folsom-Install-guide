@@ -11,7 +11,8 @@
 #
 
 # Host address
-HOST_IP=192.168.100.51
+HOST_IP=10.111.80.201
+EXT_HOST_IP=10.222.90.201
 
 # MySQL definitions
 MYSQL_USER=keystoneUser
@@ -72,7 +73,7 @@ EOF
       exit 1
       ;;
   esac
-done  
+done
 
 if [ -z "$KEYSTONE_REGION" ]; then
   echo "Keystone region not set. Please set with -R option or set KEYSTONE_REGION variable." >&2
@@ -97,38 +98,34 @@ fi
 if [ -n "$missing_args" ]; then
   exit 1
 fi
- 
+
 keystone service-create --name nova --type compute --description 'OpenStack Compute Service'
 keystone service-create --name cinder --type volume --description 'OpenStack Volume Service'
 keystone service-create --name glance --type image --description 'OpenStack Image Service'
 keystone service-create --name keystone --type identity --description 'OpenStack Identity'
 keystone service-create --name ec2 --type ec2 --description 'OpenStack EC2 service'
-keystone service-create --name quantum --type network --description 'OpenStack Networking service'
 
 create_endpoint () {
   case $1 in
     compute)
-    keystone endpoint-create --region $KEYSTONE_REGION --service-id $2 --publicurl 'http://'"$HOST_IP"':8774/v2/$(tenant_id)s' --adminurl 'http://'"$HOST_IP"':8774/v2/$(tenant_id)s' --internalurl 'http://'"$HOST_IP"':8774/v2/$(tenant_id)s'
+    keystone endpoint-create --region $KEYSTONE_REGION --service-id $2 --publicurl 'http://'"$EXT_HOST_IP"':8774/v2/$(tenant_id)s' --adminurl 'http://'"$HOST_IP"':8774/v2/$(tenant_id)s' --internalurl 'http://'"$HOST_IP"':8774/v2/$(tenant_id)s'
     ;;
     volume)
-    keystone endpoint-create --region $KEYSTONE_REGION --service-id $2 --publicurl 'http://'"$HOST_IP"':8776/v1/$(tenant_id)s' --adminurl 'http://'"$HOST_IP"':8776/v1/$(tenant_id)s' --internalurl 'http://'"$HOST_IP"':8776/v1/$(tenant_id)s'
+    keystone endpoint-create --region $KEYSTONE_REGION --service-id $2 --publicurl 'http://'"$EXT_HOST_IP"':8776/v1/$(tenant_id)s' --adminurl 'http://'"$HOST_IP"':8776/v1/$(tenant_id)s' --internalurl 'http://'"$HOST_IP"':8776/v1/$(tenant_id)s'
     ;;
     image)
-    keystone endpoint-create --region $KEYSTONE_REGION --service-id $2 --publicurl 'http://'"$HOST_IP"':9292/v2' --adminurl 'http://'"$HOST_IP"':9292/v2' --internalurl 'http://'"$HOST_IP"':9292/v2'
+    keystone endpoint-create --region $KEYSTONE_REGION --service-id $2 --publicurl 'http://'"$EXT_HOST_IP"':9292/v2' --adminurl 'http://'"$HOST_IP"':9292/v2' --internalurl 'http://'"$HOST_IP"':9292/v2'
     ;;
     identity)
-    keystone endpoint-create --region $KEYSTONE_REGION --service-id $2 --publicurl 'http://'"$HOST_IP"':5000/v2.0' --adminurl 'http://'"$HOST_IP"':35357/v2.0' --internalurl 'http://'"$HOST_IP"':5000/v2.0'
+    keystone endpoint-create --region $KEYSTONE_REGION --service-id $2 --publicurl 'http://'"$EXT_HOST_IP"':5000/v2.0' --adminurl 'http://'"$HOST_IP"':35357/v2.0' --internalurl 'http://'"$HOST_IP"':5000/v2.0'
     ;;
     ec2)
-    keystone endpoint-create --region $KEYSTONE_REGION --service-id $2 --publicurl 'http://'"$HOST_IP"':8773/services/Cloud' --adminurl 'http://'"$HOST_IP"':8773/services/Admin' --internalurl 'http://'"$HOST_IP"':8773/services/Cloud'
-    ;;
-    network)
-    keystone endpoint-create --region $KEYSTONE_REGION --service-id $2 --publicurl 'http://'"$HOST_IP"':9696/' --adminurl 'http://'"$HOST_IP"':9696/' --internalurl 'http://'"$HOST_IP"':9696/'
+    keystone endpoint-create --region $KEYSTONE_REGION --service-id $2 --publicurl 'http://'"$EXT_HOST_IP"':8773/services/Cloud' --adminurl 'http://'"$HOST_IP"':8773/services/Admin' --internalurl 'http://'"$HOST_IP"':8773/services/Cloud'
     ;;
   esac
 }
 
-for i in compute volume image object-store identity ec2 network; do
+for i in compute volume image object-store identity ec2 ; do
   id=`mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -ss -e "SELECT id FROM service WHERE type='"$i"';"` || exit 1
   create_endpoint $i $id
 done
