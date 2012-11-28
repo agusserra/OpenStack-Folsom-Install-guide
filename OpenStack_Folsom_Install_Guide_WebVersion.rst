@@ -38,7 +38,7 @@ Table of Contents
   8. Start your first VM
   9. Licencing
   10. Contacts
-  11. Acknowledgement
+  11. References
   12. Credits
   13. To do
 
