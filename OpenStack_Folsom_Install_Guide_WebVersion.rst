@@ -284,9 +284,15 @@ This is how we install OpenStack's identity service:
 5. Nova
 =================
 
-* Start by installing nova components::
+* Start by adding this script to /etc/network/if-pre-up.d/iptablesload to forward traffic to em2.90::
 
-   apt-get install -y nova-api nova-cert novnc nova-consoleauth nova-scheduler nova-novncproxy
+   #!/bin/sh
+   iptables -t nat -A POSTROUTING -o em2.90 -j MASQUERADE
+   exit 0
+
+* Install these packages::
+
+   apt-get install nova-api nova-cert nova-doc nova-scheduler nova-consoleauth
 
 * Prepare a Mysql database for Nova::
 
@@ -307,60 +313,84 @@ This is how we install OpenStack's identity service:
    admin_password = service_pass
    signing_dirname = /tmp/keystone-signing-nova
 
-* Modify the /etc/nova/nova.conf like this::
 
-   [DEFAULT]
-   logdir=/var/log/nova
-   state_path=/var/lib/nova
-   lock_path=/run/lock/nova
-   verbose=True
-   api_paste_config=/etc/nova/api-paste.ini
-   scheduler_driver=nova.scheduler.simple.SimpleScheduler
-   s3_host=10.111.80.201
-   ec2_host=10.111.80.201
-   ec2_dmz_host=10.111.80.201
-   rabbit_host=10.111.80.201
-   cc_host=10.111.80.201
-   metadata_host=10.111.80.201
-   metadata_listen=0.0.0.0
-   nova_url=http://10.111.80.201:8774/v1.1/
-   sql_connection=mysql://novaUser:novaPass@localhost/nova
-   ec2_url=http://10.111.80.201:8773/services/Cloud 
-   root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
+* Change your /etc/nova/nova.conf to look like this::
 
-   # Auth
-   use_deprecated_auth=false
-   auth_strategy=keystone
-   keystone_ec2_url=http://10.111.80.201:5000/v2.0/ec2tokens
-   # Imaging service
-   glance_api_servers=10.111.80.201:9292
-   image_service=nova.image.glance.GlanceImageService
+    [DEFAULT]
+    
+    # LOGS/STATE
+    verbose=True
+    logdir=/var/log/nova
+    state_path=/var/lib/nova
+    lock_path=/run/lock/nova
+    
+    # AUTHENTICATION
+    auth_strategy=keystone
+    
+    # SCHEDULER
+    scheduler_driver=nova.scheduler.multi.MultiScheduler
+    compute_scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
+    
+    # CINDER
+    volume_api_class=nova.volume.cinder.API
+    
+    # DATABASE
+    sql_connection=mysql://novaUser:novaPass@10.111.80.201/nova
+    
+    # COMPUTE
+    libvirt_type=kvm
+    libvirt_use_virtio_for_bridges=True
+    start_guests_on_host_boot=True
+    resume_guests_state_on_host_boot=True
+    api_paste_config=/etc/nova/api-paste.ini
+    allow_admin_api=True
+    use_deprecated_auth=False
+    nova_url=http://10.111.80.201:8774/v1.1/
+    root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
+    
+    # APIS
+    ec2_host=10.111.80.201
+    ec2_url=http://10.111.80.201:8773/services/Cloud
+    keystone_ec2_url=http://10.111.80.201:5000/v2.0/ec2tokens
+    s3_host=10.111.80.201
+    cc_host=10.111.80.201
+    metadata_host=10.111.80.201
+    #metadata_listen=0.0.0.0
+    enabled_apis=ec2,osapi_compute,metadata
+    
+    # RABBITMQ
+    rabbit_host=10.111.80.201
+    
+    # GLANCE
+    image_service=nova.image.glance.GlanceImageService
+    glance_api_servers=10.111.80.201:9292
+    
+    # NETWORK
+    network_manager=nova.network.manager.FlatDHCPManager
+    force_dhcp_release=True
+    dhcpbridge_flagfile=/etc/nova/nova.conf
+    dhcpbridge=/usr/bin/nova-dhcpbridge
+    firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
+    public_interface=em2
+    flat_interface=em1
+    flat_network_bridge=br100
+    fixed_range=192.168.6.0/24
+    network_size=256
+    flat_network_dhcp_start=192.168.6.0
+    flat_injected=False
+    connection_type=libvirt
+    multi_host=True
 
-   # Vnc configuration
-   novnc_enabled=true
-   novncproxy_base_url=http://10.111.80.201:6080/vnc_auto.html
-   novncproxy_port=6080
-   vncserver_proxyclient_address=10.111.80.201
-   vncserver_listen=0.0.0.0 
+* Don't forget to update the ownership rights of the nova directory::
 
-   # Network settings
-   network_api_class=nova.network.quantumv2.api.API
-   quantum_url=http://10.111.80.201:9696
-   quantum_auth_strategy=keystone
-   quantum_admin_tenant_name=service
-   quantum_admin_username=quantum
-   quantum_admin_password=service_pass
-   quantum_admin_auth_url=http://10.111.80.201:35357/v2.0
-   libvirt_vif_driver=nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver
-   linuxnet_interface_driver=nova.network.linux_net.LinuxOVSInterfaceDriver
-   firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
+   chown -R nova. /etc/nova
+   chmod 644 /etc/nova/nova.conf
 
-   # Compute #
-   compute_driver=libvirt.LibvirtDriver
+* Add this line to the sudoers file::
 
-   # Cinder #
-   volume_api_class=nova.volume.cinder.API
-   osapi_volume_listen_port=5900
+   sudo visudo
+   #Paste this line anywhere you like:
+   nova ALL=(ALL) NOPASSWD:ALL
 
 * Synchronize your database::
 
@@ -374,6 +404,13 @@ This is how we install OpenStack's identity service:
 
    nova-manage service list
 
+* Use the following command to create fixed network::
+   
+   nova-manage network create private --fixed_range_v4=192.168.6.0/24 --num_networks=1 --bridge=br100 --bridge_interface=em1 --network_size=256 --multi_host=T
+
+* Create the floating IPs::
+
+   nova-manage floating create --ip_range=10.222.90.128/26
 6. Cinder
 =================
 
@@ -548,51 +585,6 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 * Restart the libvirt service to load the new values::
 
    service libvirt-bin restart
-
-10.4. OpenVSwitch
-------------------
-
-* Install the openVSwitch::
-
-   apt-get install -y openvswitch-switch openvswitch-datapath-dkms
-
-* Create the bridges::
-
-   #br-int is used for VM integration	
-   ovs-vsctl add-br br-int
-
-   #br-em2.90 is used for VM configuration 
-   ovs-vsctl add-br br-em2.90
-   ovs-vsctl add-port br-em2.90 em2.90
-
-10.5. Quantum
-------------------
-
-We don't need to install the hole quantum server here, just the openVSwitch plugin's agent
-
-* Install the Quantum openvswitch agent::
-
-   apt-get -y install quantum-plugin-openvswitch-agent
-
-* Edit the OVS plugin configuration file /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini with:: 
-
-   #Under the database section
-   [DATABASE]
-   sql_connection = mysql://quantumUser:quantumPass@10.111.80.201/quantum
-
-   #Under the OVS section
-   [OVS]
-   tenant_network_type=vlan
-   network_vlan_ranges = physnet1:1:4094
-   bridge_mappings = physnet1:br-em2.90
-
-* Make sure that your rabbitMQ IP in /etc/quantum/quantum.conf is set to the controller node::
-   
-   rabbit_host = 10.111.80.201
-
-* Restart all the services::
-
-   service quantum-plugin-openvswitch-agent restart
 
 10.6. Nova
 ------------------
