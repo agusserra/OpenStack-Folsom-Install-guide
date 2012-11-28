@@ -111,20 +111,19 @@ iface lo inet loopback
 # The primary network interface
 auto em1
 iface em1 inet static
-  address 10.111.80.201
-	netmask 255.255.255.0
-	network 10.111.80.0
-	broadcast 10.111.80.255
-	# dns-* options are implemented by the resolvconf package, if installed
-	dns-nameservers 8.8.8.8 8.8.4.4
-	dns-search despexds.net
+address 10.111.80.201
+netmask 255.255.255.0
+network 10.111.80.0
+broadcast 10.111.80.255
+# dns-* options are implemented by the resolvconf package, if installed
+dns-nameservers 8.8.8.8 8.8.4.4
+dns-search despexds.net
 
 auto em2
 iface em2 inet static
-	address 10.222.90.201
-	netmask 255.255.255.0
-	gateway 10.222.90.254
-
+address 10.222.90.201
+netmask 255.255.255.0
+gateway 10.222.90.254
 
 
 2.3. MySQL & RabbitMQ
