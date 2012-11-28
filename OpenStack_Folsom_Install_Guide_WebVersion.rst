@@ -552,23 +552,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 10.3 KVM
 ------------------
 
-* KVM is needed as the hypervisor that will be used to create virtual machines. Before you install KVM, make sure that your hardware enables virtualization::
-
-   apt-get install cpu-checker
-   kvm-ok
-
-* Normally you would get a good response. Now, move to install kvm and configure it::
-
-   apt-get install -y kvm libvirt-bin pm-utils
-
-* Edit the cgroup_device_acl array in the /etc/libvirt/qemu.conf file to::
-
-   cgroup_device_acl = [
-   "/dev/null", "/dev/full", "/dev/zero",
-   "/dev/random", "/dev/urandom",
-   "/dev/ptmx", "/dev/kvm", "/dev/kqemu",
-   "/dev/rtc", "/dev/hpet","/dev/net/tun"
-   ]
+* KVM is needed as the hypervisor that will be used to create virtual machines.
 
 * Enable live migration by updating /etc/libvirt/libvirtd.conf file::
 
@@ -593,7 +577,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
 * Install nova's required components for the compute node::
 
-   apt-get install nova-api-metadata nova-compute-kvm
+   apt-get install nova-compute nova-network nova-api-metadata
 
 * Now modify authtoken section in the /etc/nova/api-paste.ini file to this::
 
