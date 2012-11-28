@@ -2,8 +2,8 @@
   Install nova-network for OpenStack Folsom
 ==========================================================
 
-:Version: 1.0
-:Keywords: OpenStack Folsom, Nova-network, 2 NICs, Ubuntu Server 12.04 LTE (64 bits).
+:Version: 1.1
+:Keywords: OpenStack Folsom, Nova-network, 2 NICs, Ubuntu Server 12.14 LTE (64 bits).
 :Status: Stable
 
 Authors
