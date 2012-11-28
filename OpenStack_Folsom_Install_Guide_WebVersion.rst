@@ -191,18 +191,18 @@ This is how we install OpenStack's identity service:
 
 * Create a simple credential file and load it so you won't be bothered later::
 
-   nano creds
+   vi creds
    #Paste the following:
    export OS_TENANT_NAME=admin
    export OS_USERNAME=admin
    export OS_PASSWORD=admin_pass
    export OS_AUTH_URL="http://10.111.80.201:5000/v2.0/"
+   export OS_NO_CACHE=1
    # Load it:
    source creds
 
 * To test Keystone, we use a simple curl request::
 
-   apt-get install curl openssl
    curl http://10.111.80.201:35357/v2.0/endpoints -H 'x-auth-token: ADMIN'
 
 4. Glance
