@@ -411,6 +411,7 @@ This is how we install OpenStack's identity service:
 * Create the floating IPs::
 
    nova-manage floating create --ip_range=10.222.90.128/26
+
 6. Cinder
 =================
 
@@ -525,10 +526,16 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    # Uncomment net.ipv4.ip_forward=1, to save you from rebooting, perform the following
    sysctl net.ipv4.ip_forward=1
 
+* Add this script to /etc/network/if-pre-up.d/iptablesload to forward traffic to em2.90::
+
+   #!/bin/sh
+   iptables -t nat -A POSTROUTING -o em2.90 -j MASQUERADE
+   exit 0
+
 10.2.Networking
 ------------
 
-* It's recommended to have two NICs but only one needs to be internet connected::
+* It's recommended to have two NICs but only one (em2.90) needs to be internet connected::
    
    auto em1
    iface em1 inet static
@@ -680,63 +687,9 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 11. Your First VM
 ============
 
-To start your first VM, we first need to create a new tenant, user, internal and external network. SSH to your controller node and perform the following.
+To start your first VM::
 
-* Create a new tenant ::
-
-   keystone tenant-create --name project_one
-
-* Create a new user and assign the member role to it in the new tenant (keystone role-list to get the appropriate id)::
-
-   keystone user-create --name=user_one --pass=user_one --tenant-id $put_id_of_project_one --email=user_one@domain.com
-   keystone user-role-add --tenant-id $put_id_of_project_one  --user-id $put_id_of_user_one --role-id $put_id_of_member_role
-
-* Create a new network for the tenant::
-
-   quantum net-create --tenant-id $put_id_of_project_one net_proj_one --provider:network_type vlan --provider:physical_network physnet1 --provider:segmentation_id 1024
-
-* Create a new subnet inside the new tenant network::
-
-   quantum subnet-create --tenant-id $put_id_of_project_one net_proj_one 10.10.10.0/24
-
-* Create a router for the new tenant::
-
-   quantum router-create --tenant-id $put_id_of_project_one router_proj_one
-
-* Add the router to the subnet::
-
-   quantum router-interface-add $put_router_proj_one_id_here $put_subnet_id_here
-
-You can now start creating VMs but they will not be accessible from the internet. If you like them to be so, perform the following:
-
-* Create your external network with the tenant id belonging to the service tenant (keystone tenant-list to get the appropriate id) ::
-
-   quantum net-create --tenant-id $put_id_of_service_tenant ext_net --router:external=True
-
-* Create a subnet containing your floating IPs::
-
-   quantum subnet-create --tenant-id $put_id_of_service_tenant --gateway 10.111.80.254 ext_net 192.168.100.232/28 --enable_dhcp=False
-
-* Set the router for the external network::
-
-   quantum router-gateway-set $put_router_proj_one_id_here $put_id_of_ext_net_here
-
-
-Unfortunatly, you can't use the dashboard to assign floating IPs to VMs so you need to get your hands a bit dirty to give your VM a public IP.
-
-* Start by allocating a floating ip to the project one tenant::
-
-   quantum floatingip-create --tenant-id $put_id_of_project_one ext_net
-
-* pick the id of the port corresponding to your VM::
-
-   quantum port-list
-
-* Associate the floating IP to your VM::
-
-   quantum floatingip-associate $put_id_floating_ip $put_id_vm_port
-
-**This is it !**, You can now ping you VM and start administrating you OpenStack !
+    nova boot --image deb3fd68-ff77-4994-881b-361d4142639e --flavor m1.tiny test
 
 I Hope you enjoyed this guide, please if you have any feedbacks, don't hesitate.
 
