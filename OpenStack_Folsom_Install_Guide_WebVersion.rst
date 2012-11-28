@@ -110,6 +110,7 @@ Status: testing
    gateway 10.222.90.254
    dns-nameservers 8.8.8.8 8.8.4.4
    dns-search despexds.net
+   vlan-raw-device em2
 
 2.3. MySQL & RabbitMQ
 ------------
@@ -204,6 +205,8 @@ This is how we install OpenStack's identity service:
 * To test Keystone, we use a simple curl request::
 
    curl http://10.111.80.201:35357/v2.0/endpoints -H 'x-auth-token: ADMIN'
+
+* Reboot, test connectivity and check Keystone again.
 
 4. Glance
 =====================================================================
