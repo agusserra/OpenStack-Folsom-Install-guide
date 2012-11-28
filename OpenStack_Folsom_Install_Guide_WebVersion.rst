@@ -688,7 +688,7 @@ Bilel Msekni: bilel.msekni@telecom-sudparis.eu
 
 * Configuring Floating IP addresses [http://www.mirantis.com/blog/configuring-floating-ip-addresses-networking-openstack-public-private-clouds/]
 * Enabling Ping and SSH on VMs [http://docs.openstack.org/trunk/openstack-compute/admin/content/enabling-ping-and-ssh-on-vms.html]
-
+* Instances not Receiving DHCP Offers with Nova-Network Method [https://github.com/mseknibilel/OpenStack-Folsom-Install-guide/issues/14]
 
 12. Credits
 =================
@@ -703,7 +703,3 @@ This work has been based on:
 =======
 
 This guide is under testing. Your suggestions are always welcomed.
-
-Some of this guide's needs might be:
-
-* Define more Quantum configurations to cover all usecases possible see `here <http://docs.openstack.org/trunk/openstack-network/admin/content/use_cases.html>`_. 
