@@ -583,18 +583,6 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
    apt-get install nova-compute nova-network nova-api-metadata
 
-* Now modify authtoken section in the /etc/nova/api-paste.ini file to this::
-
-   [filter:authtoken]
-   paste.filter_factory = keystone.middleware.auth_token:filter_factory
-   auth_host = 10.111.80.201
-   auth_port = 35357
-   auth_protocol = http
-   admin_tenant_name = service
-   admin_user = nova
-   admin_password = service_pass
-   signing_dirname = /tmp/keystone-signing-nova
-
 * Modify the /etc/nova/nova.conf like this::
 
     [DEFAULT]
