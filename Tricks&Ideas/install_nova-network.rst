@@ -51,7 +51,7 @@ First make sure that your hardware meets these requirements:
 
 * Install these packages::
 
-   apt-get install nova-api nova-cert nova-compute nova-compute-kvm nova-doc nova-network nova-scheduler rabbitmq-server nova-consoleauth
+   apt-get install nova-api nova-cert nova-doc nova-scheduler nova-consoleauth
 
 * Prepare a Mysql database for Nova::
 
