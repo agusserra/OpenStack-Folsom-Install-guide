@@ -556,7 +556,9 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 7.3 KVM
 ------------------
 
-* KVM is needed as the hypervisor that will be used to create virtual machines.
+* KVM is needed as the hypervisor that will be used to create virtual machines::
+
+  apt-get install -y kvm libvirt-bin pm-utils
 
 * Enable live migration by updating /etc/libvirt/libvirtd.conf file::
 
