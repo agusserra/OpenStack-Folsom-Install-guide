@@ -56,8 +56,8 @@ Status: testing
 ====================
 
 :Node Role: NICs
-:Control Node: em1 (10.111.80.201), em2.90 (10.222.90.201)
-:Compute Node: em1 (10.111.80.202), em2.90 (10.222.90.202)
+:Control Node: em1 (10.254.130.201), em2.168 (10.222.90.201)
+:Compute Node: em1 (10.254.106.1), em2.168 (10.254.168.1)
 
 **Note 1:** This is my current network architecture, you can add as many compute node as you wish.
 
@@ -84,9 +84,9 @@ Status: testing
 * First, take a good look at your working routing table::
    
    Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-   0.0.0.0         10.222.90.254   0.0.0.0         UG    0      0        0 em2.90
-   10.111.80.0     0.0.0.0         255.255.255.0   U     0      0        0 em1
-   10.222.90.0     0.0.0.0         255.255.255.0   U     0      0        0 em2.90
+   0.0.0.0         10.254.130.254  0.0.0.0         UG    0      0        0 em1
+   10.254.130.0    0.0.0.0         255.255.250.0   U     0      0        0 em1
+   10.254.106.0    0.0.0.0         255.255.252.0   U     0      0        0 em2.168
  
 * /etc/network/interfaces::
 
@@ -95,11 +95,11 @@ Status: testing
  
    auto em1
    iface em1 inet static
-   address 10.111.80.201
+   address 10.254.130.201
    netmask 255.255.255.0
   
-   auto em2.90
-   iface em2.90 inet static
+   auto em2.168
+   iface em2.168 inet static
    address 10.222.90.201
    netmask 255.255.255.0
    gateway 10.222.90.254
@@ -192,14 +192,14 @@ This is how we install OpenStack's identity service:
    export OS_TENANT_NAME=admin
    export OS_USERNAME=admin
    export OS_PASSWORD=admin_pass
-   export OS_AUTH_URL="http://10.111.80.201:5000/v2.0/"
+   export OS_AUTH_URL="http://10.254.130.201:5000/v2.0/"
    export OS_NO_CACHE=1
    # Load it:
    source creds
 
 * To test Keystone, we use a simple curl request::
 
-   curl http://10.111.80.201:35357/v2.0/endpoints -H 'x-auth-token: ADMIN'
+   curl http://10.254.130.201:35357/v2.0/endpoints -H 'x-auth-token: ADMIN'
 
 * Reboot, test connectivity and check Keystone again.
 
@@ -221,7 +221,7 @@ This is how we install OpenStack's identity service:
 
    [filter:authtoken]
    paste.filter_factory = keystone.middleware.auth_token:filter_factory
-   auth_host = 10.111.80.201
+   auth_host = 10.254.130.201
    auth_port = 35357
    auth_protocol = http
    admin_tenant_name = service
@@ -232,7 +232,7 @@ This is how we install OpenStack's identity service:
 
    [filter:authtoken]
    paste.filter_factory = keystone.middleware.auth_token:filter_factory
-   auth_host = 10.111.80.201
+   auth_host = 10.254.130.201
    auth_port = 35357
    auth_protocol = http
    admin_tenant_name = service
@@ -279,10 +279,10 @@ This is how we install OpenStack's identity service:
 5. Nova
 =================
 
-* Start by adding this script to /etc/network/if-pre-up.d/iptablesload to forward traffic to em2.90::
+* Start by adding this script to /etc/network/if-pre-up.d/iptablesload to forward traffic to em2.168::
 
    #!/bin/sh
-   iptables -t nat -A POSTROUTING -o em2.90 -j MASQUERADE
+   iptables -t nat -A POSTROUTING -o em2.168 -j MASQUERADE
    exit 0
 
 * Install these packages::
@@ -300,7 +300,7 @@ This is how we install OpenStack's identity service:
 
    [filter:authtoken]
    paste.filter_factory = keystone.middleware.auth_token:filter_factory
-   auth_host = 10.111.80.201
+   auth_host = 10.254.130.201
    auth_port = 35357
    auth_protocol = http
    admin_tenant_name = service
@@ -330,7 +330,7 @@ This is how we install OpenStack's identity service:
     volume_api_class=nova.volume.cinder.API
     
     # DATABASE
-    sql_connection=mysql://novaUser:novaPass@10.111.80.201/nova
+    sql_connection=mysql://novaUser:novaPass@10.254.130.201/nova
     
     # COMPUTE
     libvirt_type=kvm
@@ -340,25 +340,25 @@ This is how we install OpenStack's identity service:
     api_paste_config=/etc/nova/api-paste.ini
     allow_admin_api=True
     use_deprecated_auth=False
-    nova_url=http://10.111.80.201:8774/v1.1/
+    nova_url=http://10.254.130.201:8774/v1.1/
     root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
     
     # APIS
-    ec2_host=10.111.80.201
-    ec2_url=http://10.111.80.201:8773/services/Cloud
-    keystone_ec2_url=http://10.111.80.201:5000/v2.0/ec2tokens
-    s3_host=10.111.80.201
-    cc_host=10.111.80.201
-    metadata_host=10.111.80.201
+    ec2_host=10.254.130.201
+    ec2_url=http://10.254.130.201:8773/services/Cloud
+    keystone_ec2_url=http://10.254.130.201:5000/v2.0/ec2tokens
+    s3_host=10.254.130.201
+    cc_host=10.254.130.201
+    metadata_host=10.254.130.201
     #metadata_listen=0.0.0.0
     enabled_apis=ec2,osapi_compute,metadata
     
     # RABBITMQ
-    rabbit_host=10.111.80.201
+    rabbit_host=10.254.130.201
     
     # GLANCE
     image_service=nova.image.glance.GlanceImageService
-    glance_api_servers=10.111.80.201:9292
+    glance_api_servers=10.254.130.201:9292
     
     # NETWORK
     network_manager=nova.network.manager.FlatDHCPManager
@@ -446,9 +446,9 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    [filter:authtoken]
    paste.filter_factory = keystone.middleware.auth_token:filter_factory
    service_protocol = http
-   service_host = 10.111.80.201
+   service_host = 10.254.130.201
    service_port = 5000
-   auth_host = 10.111.80.201
+   auth_host = 10.254.130.201
    auth_port = 35357
    auth_protocol = http
    admin_tenant_name = service
@@ -517,7 +517,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
 * Configure the NTP server to follow the controller node::
    
-   sed -i 's/server ntp.ubuntu.com/server 10.111.80.201/g' /etc/ntp.conf
+   sed -i 's/server ntp.ubuntu.com/server 10.254.130.201/g' /etc/ntp.conf
    service ntp restart  
 
 * Install other services::
@@ -530,26 +530,26 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    # Uncomment net.ipv4.ip_forward=1, to save you from rebooting, perform the following
    sysctl net.ipv4.ip_forward=1
 
-* Add this script to /etc/network/if-pre-up.d/iptablesload to forward traffic to em2.90::
+* Add this script to /etc/network/if-pre-up.d/iptablesload to forward traffic to em2.168::
 
    #!/bin/sh
-   iptables -t nat -A POSTROUTING -o em2.90 -j MASQUERADE
+   iptables -t nat -A POSTROUTING -o em2.168 -j MASQUERADE
    exit 0
 
 7.2.Networking
 ------------
 
-* It's recommended to have two NICs but only one (em2.90) needs to be internet connected::
+* It's recommended to have two NICs but only one (em2.168) needs to be internet connected::
    
    auto em1
    iface em1 inet static
-   address 10.111.80.202
+   address 10.254.106.1
    netmask 255.255.255.0
    dns-nameservers 8.8.8.8
 
-   auto em2.90
-   iface em2.90 inet static
-   address 10.222.90.202
+   auto em2.168
+   iface em2.168 inet static
+   address 10.254.168.1
    netmask 255.255.255.0
    gateway 10.222.90.254
 
@@ -604,7 +604,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
     volume_api_class=nova.volume.cinder.API
     
     # DATABASE
-    sql_connection=mysql://novaUser:novaPass@10.111.80.201/nova
+    sql_connection=mysql://novaUser:novaPass@10.254.130.201/nova
     
     # COMPUTE
     libvirt_type=kvm
@@ -614,23 +614,23 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
     api_paste_config=/etc/nova/api-paste.ini
     allow_admin_api=True
     use_deprecated_auth=False
-    nova_url=http://10.111.80.201:8774/v1.1/
+    nova_url=http://10.254.130.201:8774/v1.1/
     root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
     
     # APIS
-    ec2_host=10.111.80.201
-    ec2_url=http://10.111.80.201:8773/services/Cloud
-    keystone_ec2_url=http://10.111.80.201:5000/v2.0/ec2tokens
-    s3_host=10.111.80.201
-    cc_host=10.111.80.201
+    ec2_host=10.254.130.201
+    ec2_url=http://10.254.130.201:8773/services/Cloud
+    keystone_ec2_url=http://10.254.130.201:5000/v2.0/ec2tokens
+    s3_host=10.254.130.201
+    cc_host=10.254.130.201
     metadata_host=10.111.80.203
     
     # RABBITMQ
-    rabbit_host=10.111.80.201
+    rabbit_host=10.254.130.201
     
     # GLANCE
     image_service=nova.image.glance.GlanceImageService
-    glance_api_servers=10.111.80.201:9292
+    glance_api_servers=10.254.130.201:9292
     
     # NETWORK
     network_manager=nova.network.manager.FlatDHCPManager
@@ -638,7 +638,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
     dhcpbridge_flagfile=/etc/nova/nova.conf
     dhcpbridge=/usr/bin/nova-dhcpbridge
     firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
-    public_interface=em2.90
+    public_interface=em2.168
     flat_interface=em1
     flat_network_bridge=br100
     fixed_range=192.168.6.0/24
