@@ -6,22 +6,6 @@
 :Source: https://github.com/mseknibilel/OpenStack-Folsom-Install-guide
 :Keywords: Multi node OpenStack, Folsom, Nova, Nova-Network, Keystone, Glance, Cinder, KVM, Ubuntu Server 12.10 (64 bits).
 
-Authors
-==========
-
-Copyright (C) Bilel Msekni <bilel.msekni@telecom-sudparis.eu>
-
-Contributors
-==========
-
-* Roy Sowa <Roy.Sowa@ssc-spc.gc.ca>
-* Marco Consonni <marco_consonni@hp.com>
-* Dennis E Miyoshi <dennis.miyoshi@hp.com>
-* Houssem Medhioub <houssem.medhioub@it-sudparis.eu>
-* Djamal Zeghlache <djamal.zeghlache@telecom-sudparis.eu>
-
-Wana contribute ? Read the guide, send your contribution and get your name listed ;)
-
 Table of Contents
 =================
 
@@ -56,10 +40,10 @@ Status: testing
 ====================
 
 :Node Role: NICs
-:Control Node: em1 (10.111.80.201), em2.90 (10.222.90.201)
-:Compute Node: em1 (10.111.80.202), em2.90 (10.222.90.202)
+:Controller Node: eth0 (10.111.81.1)
+:Compute Node: eth0 (10.111.81.2)
 
-**Note 1:** This is my current network architecture, you can add as many compute node as you wish.
+**Note:** You can add as many compute node as you wish.
 
 .. image:: http://i.imgur.com/RK6X7.jpg
 
@@ -69,7 +53,7 @@ Status: testing
 2.1. Preparing Ubuntu 12.10
 -----------------
 
-* After you install Ubuntu 12.10 Server 64bits, Go to the sudo mode and don't leave it until the end of this guide::
+* After you install Ubuntu 12.10 Server 64bits, go to the sudo mode and don't leave it until the end of this guide::
 
    sudo su
 
@@ -84,28 +68,23 @@ Status: testing
 * First, take a good look at your working routing table::
    
    Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-   0.0.0.0         10.222.90.254   0.0.0.0         UG    0      0        0 em2.90
-   10.111.80.0     0.0.0.0         255.255.255.0   U     0      0        0 em1
-   10.222.90.0     0.0.0.0         255.255.255.0   U     0      0        0 em2.90
+   0.0.0.0         10.111.81.254   0.0.0.0         UG    0      0        0 eth0
+   10.111.81.0     0.0.0.0         255.255.255.0   U     0      0        0 eth0
  
 * /etc/network/interfaces::
 
    auto lo
    iface lo inet loopback
  
-   auto em1
-   iface em1 inet static
-   address 10.111.80.201
+   auto eth0
+   iface eth0 inet static
+   address 10.111.81.1
    netmask 255.255.255.0
-  
-   auto em2.90
-   iface em2.90 inet static
-   address 10.222.90.201
-   netmask 255.255.255.0
-   gateway 10.222.90.254
-   dns-nameservers 8.8.8.8 8.8.4.4
+   network 10.111.81.0
+   broadcast 10.111.81.255
+   gateway 10.111.81.254
+   dns-nameservers 10.1.1.68 10.1.1.42
    dns-search despexds.net
-   vlan-raw-device em2
 
 2.3. MySQL & RabbitMQ
 ------------
@@ -118,6 +97,14 @@ Status: testing
 
    sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mysql/my.cnf
    service mysql restart
+
+* Permit the user root to connect from everywhere and delete the anonymous user::
+
+   mysql -u root -p
+   update mysql.user set host = '%' where host = '::1';
+   delete from mysql.user where user = '';
+   flush privileges;
+   quit;
 
 * Install RabbitMQ::
 
