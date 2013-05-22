@@ -208,7 +208,7 @@ This is how we install OpenStack's identity service:
 
    [filter:authtoken]
    paste.filter_factory = keystone.middleware.auth_token:filter_factory
-   auth_host = 10.111.80.201
+   auth_host = 10.111.81.1
    auth_port = 35357
    auth_protocol = http
    admin_tenant_name = service
@@ -219,7 +219,7 @@ This is how we install OpenStack's identity service:
 
    [filter:authtoken]
    paste.filter_factory = keystone.middleware.auth_token:filter_factory
-   auth_host = 10.111.80.201
+   auth_host = 10.111.81.1
    auth_port = 35357
    auth_protocol = http
    admin_tenant_name = service
@@ -287,7 +287,7 @@ This is how we install OpenStack's identity service:
 
    [filter:authtoken]
    paste.filter_factory = keystone.middleware.auth_token:filter_factory
-   auth_host = 10.111.80.201
+   auth_host = 10.111.81.1
    auth_port = 35357
    auth_protocol = http
    admin_tenant_name = service
@@ -317,7 +317,7 @@ This is how we install OpenStack's identity service:
     volume_api_class=nova.volume.cinder.API
     
     # DATABASE
-    sql_connection=mysql://novaUser:novaPass@10.111.80.201/nova
+    sql_connection=mysql://novaUser:novaPass@10.111.81.1/nova
     
     # COMPUTE
     libvirt_type=kvm
@@ -353,7 +353,7 @@ This is how we install OpenStack's identity service:
     dhcpbridge_flagfile=/etc/nova/nova.conf
     dhcpbridge=/usr/bin/nova-dhcpbridge
     firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
-    public_interface=em2
+    public_interface=eth0
     flat_interface=em1
     flat_network_bridge=br100
     fixed_range=192.168.6.0/24
@@ -388,11 +388,11 @@ This is how we install OpenStack's identity service:
 
 * Use the following command to create fixed network::
    
-   nova-manage network create private --fixed_range_v4=192.168.6.0/24 --num_networks=1 --bridge=br100 --bridge_interface=em1 --network_size=256 --multi_host=T
+   nova-manage network create private --fixed_range_v4=192.168.6.0/24 --num_networks=1 --bridge=br100 --bridge_interface=eth0 --network_size=256 --multi_host=T
 
 * Create the floating IPs::
 
-   nova-manage floating create --ip_range=10.222.90.128/26
+   nova-manage floating create --ip_range=10.111.81.128/26
 
 * Create the floating to the nova project, run the next command many times as your network IPs::
 
