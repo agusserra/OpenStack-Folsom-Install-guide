@@ -327,25 +327,25 @@ This is how we install OpenStack's identity service:
     api_paste_config=/etc/nova/api-paste.ini
     allow_admin_api=True
     use_deprecated_auth=False
-    nova_url=http://10.111.80.201:8774/v1.1/
+    nova_url=http://10.111.81.1:8774/v1.1/
     root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
     
     # APIS
-    ec2_host=10.111.80.201
-    ec2_url=http://10.111.80.201:8773/services/Cloud
-    keystone_ec2_url=http://10.111.80.201:5000/v2.0/ec2tokens
-    s3_host=10.111.80.201
-    cc_host=10.111.80.201
-    metadata_host=10.111.80.201
+    ec2_host=10.111.81.1
+    ec2_url=http://10.111.81.1:8773/services/Cloud
+    keystone_ec2_url=http://10.111.81.1:5000/v2.0/ec2tokens
+    s3_host=10.111.81.1
+    cc_host=10.111.81.1
+    metadata_host=10.111.81.1
     #metadata_listen=0.0.0.0
     enabled_apis=ec2,osapi_compute,metadata
     
     # RABBITMQ
-    rabbit_host=10.111.80.201
+    rabbit_host=10.111.81.1
     
     # GLANCE
     image_service=nova.image.glance.GlanceImageService
-    glance_api_servers=10.111.80.201:9292
+    glance_api_servers=10.111.81.1:9292
     
     # NETWORK
     network_manager=nova.network.manager.FlatDHCPManager
@@ -433,9 +433,9 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    [filter:authtoken]
    paste.filter_factory = keystone.middleware.auth_token:filter_factory
    service_protocol = http
-   service_host = 10.111.80.201
+   service_host = 10.111.81.1
    service_port = 5000
-   auth_host = 10.111.80.201
+   auth_host = 10.111.81.1
    auth_port = 35357
    auth_protocol = http
    admin_tenant_name = service
@@ -504,7 +504,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
 * Configure the NTP server to follow the controller node::
    
-   sed -i 's/server ntp.ubuntu.com/server 10.111.80.201/g' /etc/ntp.conf
+   sed -i 's/server ntp.ubuntu.com/server 10.111.81.1/g' /etc/ntp.conf
    service ntp restart  
 
 * Install other services::
@@ -513,7 +513,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
 * Enable IP_Forwarding::
 
-   nano /etc/sysctl.conf
+   vi /etc/sysctl.conf
    # Uncomment net.ipv4.ip_forward=1, to save you from rebooting, perform the following
    sysctl net.ipv4.ip_forward=1
 
@@ -543,7 +543,28 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 7.3 KVM
 ------------------
 
-* KVM is needed as the hypervisor that will be used to create virtual machines.
+* Make sure that your hardware enables virtualization::
+
+   apt-get install cpu-checker
+   kvm-ok
+
+* Normally you would get a good response. Now, move to install kvm and configure it::
+
+   apt-get install -y kvm libvirt-bin pm-utils
+
+* Edit the cgroup_device_acl array in the /etc/libvirt/qemu.conf file to::
+
+   cgroup_device_acl = [
+   "/dev/null", "/dev/full", "/dev/zero",
+   "/dev/random", "/dev/urandom",
+   "/dev/ptmx", "/dev/kvm", "/dev/kqemu",
+   "/dev/rtc", "/dev/hpet","/dev/net/tun"
+   ]
+
+* Delete default virtual bridge::
+
+   virsh net-destroy default
+   virsh net-undefine default
 
 * Enable live migration by updating /etc/libvirt/libvirtd.conf file::
 
@@ -591,7 +612,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
     volume_api_class=nova.volume.cinder.API
     
     # DATABASE
-    sql_connection=mysql://novaUser:novaPass@10.111.80.201/nova
+    sql_connection=mysql://novaUser:novaPass@10.111.81.1/nova
     
     # COMPUTE
     libvirt_type=kvm
@@ -601,23 +622,23 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
     api_paste_config=/etc/nova/api-paste.ini
     allow_admin_api=True
     use_deprecated_auth=False
-    nova_url=http://10.111.80.201:8774/v1.1/
+    nova_url=http://10.111.81.1:8774/v1.1/
     root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
     
     # APIS
     ec2_host=10.111.80.201
-    ec2_url=http://10.111.80.201:8773/services/Cloud
-    keystone_ec2_url=http://10.111.80.201:5000/v2.0/ec2tokens
-    s3_host=10.111.80.201
-    cc_host=10.111.80.201
+    ec2_url=http://10.111.81.1:8773/services/Cloud
+    keystone_ec2_url=http://10.111.81.1:5000/v2.0/ec2tokens
+    s3_host=10.111.81.1
+    cc_host=10.111.81.1
     metadata_host=10.111.80.203
     
     # RABBITMQ
-    rabbit_host=10.111.80.201
+    rabbit_host=10.111.81.1
     
     # GLANCE
     image_service=nova.image.glance.GlanceImageService
-    glance_api_servers=10.111.80.201:9292
+    glance_api_servers=10.111.81.1:9292
     
     # NETWORK
     network_manager=nova.network.manager.FlatDHCPManager
@@ -625,8 +646,8 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
     dhcpbridge_flagfile=/etc/nova/nova.conf
     dhcpbridge=/usr/bin/nova-dhcpbridge
     firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
-    public_interface=em2.90
-    flat_interface=em1
+    public_interface=eth0
+    flat_interface=eth0
     flat_network_bridge=br100
     fixed_range=192.168.6.0/24
     network_size=256
