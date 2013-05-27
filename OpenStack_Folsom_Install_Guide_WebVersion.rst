@@ -520,7 +520,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 * Add this script to /etc/network/if-pre-up.d/iptablesload to forward traffic to em2.90::
 
    #!/bin/sh
-   iptables -t nat -A POSTROUTING -o em2.90 -j MASQUERADE
+   iptables -t nat -A POSTROUTING -o em1 -j MASQUERADE
    exit 0
 
 7.2.Networking
@@ -631,7 +631,6 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
     keystone_ec2_url=http://10.111.81.1:5000/v2.0/ec2tokens
     s3_host=10.111.81.1
     cc_host=10.111.81.1
-    metadata_host=10.111.80.203
     
     # RABBITMQ
     rabbit_host=10.111.81.1
@@ -646,8 +645,8 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
     dhcpbridge_flagfile=/etc/nova/nova.conf
     dhcpbridge=/usr/bin/nova-dhcpbridge
     firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
-    public_interface=eth0
-    flat_interface=eth0
+    public_interface=em1
+    flat_interface=em2
     flat_network_bridge=br100
     fixed_range=192.168.6.0/24
     network_size=256
@@ -673,39 +672,4 @@ To start your first VM:
 
     nova boot --image deb3fd68-ff77-4994-881b-361d4142639e --flavor m1.tiny test
 
-I Hope you enjoyed this guide, please if you have any feedbacks, don't hesitate.
 
-9. Licensing
-============
-
-OpenStack Folsom Install Guide by Bilel Msekni is licensed under a Creative Commons Attribution 3.0 Unported License.
-
-.. image:: http://i.imgur.com/4XWrp.png
-To view a copy of this license, visit [ http://creativecommons.org/licenses/by/3.0/deed.en_US ].
-
-10. Contacts
-===========
-
-Bilel Msekni: bilel.msekni@telecom-sudparis.eu
-
-11. References
-=================
-
-* Configuring Floating IP addresses [http://www.mirantis.com/blog/configuring-floating-ip-addresses-networking-openstack-public-private-clouds/]
-* Enabling Ping and SSH on VMs [http://docs.openstack.org/trunk/openstack-compute/admin/content/enabling-ping-and-ssh-on-vms.html]
-* Instances not Receiving DHCP Offers with Nova-Network Method [https://github.com/mseknibilel/OpenStack-Folsom-Install-guide/issues/14]
-
-12. Credits
-=================
-
-This work has been based on:
-
-* Emilien Macchi's Folsom guide [https://github.com/EmilienM/openstack-folsom-guide]
-* OpenStack Documentation [http://docs.openstack.org/trunk/openstack-compute/install/apt/content/]
-* OpenStack Quantum Install [http://docs.openstack.org/trunk/openstack-network/admin/content/ch_install.html]
-* Vlan configuration [https://wiki.ubuntu.com/vlan]
-
-13. To do
-=======
-
-This guide is under testing. Your suggestions are always welcomed.
