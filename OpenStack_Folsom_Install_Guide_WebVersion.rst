@@ -34,7 +34,7 @@ Status: testing
 ====================
 
 :Node Role: NICs
-:Controller Node: eth0 (10.111.81.1)
+:Control Node: eth0 (10.111.81.1)
 :Compute Node: eth0 (10.111.81.2)
 
 **Note:** You can add as many compute node as you wish.
