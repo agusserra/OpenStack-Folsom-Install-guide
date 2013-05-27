@@ -11,7 +11,6 @@ Table of Contents
 
 ::
 
-  0. What is it?
   1. Requirements
   2. Getting Ready
   3. Keystone 
@@ -20,11 +19,6 @@ Table of Contents
   6. Cinder
   7. Adding a compute node
   8. Start your first VM
-  9. Licencing
-  10. Contacts
-  11. References
-  12. Credits
-  13. To do
 
 0. What is it?
 ==============
