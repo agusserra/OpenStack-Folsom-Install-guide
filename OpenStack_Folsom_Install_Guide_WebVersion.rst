@@ -676,5 +676,3 @@ To start your first VM:
 
 * Launch the instance using tha ID::
    nova boot --image fb42188e-adce-4386-bc8c-99472033d525 --flavor m1.small --key-name master test --meta host=$(hostname)
-
-
