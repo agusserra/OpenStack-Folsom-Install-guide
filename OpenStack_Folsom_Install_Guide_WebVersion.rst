@@ -671,8 +671,10 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
 To start your first VM:
 
-* Run a glance image-list first to find the UUID from the image to boot::
+* Find the ID from the image to boot::
+   glance image-list
 
-    nova boot --image deb3fd68-ff77-4994-881b-361d4142639e --flavor m1.tiny test
+* Launch the instance using tha ID::
+   nova boot --image fb42188e-adce-4386-bc8c-99472033d525 --flavor m1.small --key-name master test --meta host=$(hostname)
 
 
