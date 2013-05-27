@@ -671,6 +671,12 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
 To start your first VM:
 
+* Create the master key pair::
+
+   ssh-keygen -t dsa
+   cp /root/.ssh/id_dsa.pub /root/master.pem
+   nova keypair-add --pub-key /root/.ssh/id_dsa.pub master
+
 * Find the ID from the image to boot::
 
    glance image-list
