@@ -4,7 +4,6 @@
 
 :Version: 1.0
 :Source: https://github.com/mseknibilel/OpenStack-Folsom-Install-guide
-:Keywords: Multi node OpenStack, Folsom, Nova, Nova-Network, Keystone, Glance, Cinder, KVM, Ubuntu Server 12.10 (64 bits).
 
 Table of Contents
 =================
@@ -177,7 +176,7 @@ This is how we install OpenStack's identity service:
 4. Glance
 =====================================================================
 
-* After installing Keystone, we continue with installing image storage service a.k.a Glance::
+* After installing Keystone, we continue with installing image storage service (a.k.a Glance)::
 
    apt-get install glance
 
@@ -236,7 +235,7 @@ This is how we install OpenStack's identity service:
 
    glance-manage db_sync
 
-* To test Glance's well installation, we upload a new image to the store. Start by downloading the cirros cloud image to your node and then uploading it to Glance::
+* To test Glance, we upload a new image to the store. Start by downloading the cirros cloud image to your node and then uploading it to Glance::
 
    mkdir images
    cd images
@@ -247,13 +246,41 @@ This is how we install OpenStack's identity service:
 
    glance image-list
 
+* Create the following script, called migrate-to-folsom.sh, to import Despegar's Ubuntu base image::
+
+   set -e -x
+   if [ "$#" -eq 3 ]; then
+   :
+   else
+     [ "$#" -eq 2 ] || { echo 'Usage: migrate.sh VERSION(ej.2013.03.15) DISTRO(ubuntu|redhat|...)'; exit 1; }
+   fi;
+   
+   VERSION=$1
+   DISTRO=$2
+   
+   GLANCE_ORIG=http://10.111.80.15:9292
+   GLANCE_TARGET=http://10.111.81.1:9292
+   KEYSTONE_ORIG=http://10.111.80.15:5000/v2.0/
+   KEYSTONE_TARGET=http://10.111.81.1:5000/v2.0/
+   PASS_ORIG=ADMIN
+   PASS_TARGET=service_pass
+   
+   TOKEN_ORIG=$(curl -H "Content-Type: application/json" -d "{\"auth\": {\"tenantName\": \"admin\", \"passwordCredentials\": {\"username\": \"admin\", \"password\": \"$PASS_ORIG\"}}}" $KEYSTONE_ORIG/tokens | python -c "import sys; print ''.join(sys.stdin.readlines()).split('"id"')[1].split('\"')[2]")
+   TOKEN_TARGET=$(curl -H "Content-Type: application/json" -d "{\"auth\": {\"tenantName\": \"admin\", \"passwordCredentials\": {\"username\": \"admin\", \"password\": \"$PASS_TARGET\"}}}" $KEYSTONE_TARGET/tokens | python -c "import sys; print ''.join(sys.stdin.readlines()).split('"id"')[1].split('\"')[2]")
+   AUTH_ORIG="--url $GLANCE_ORIG/v1/images -A $TOKEN_ORIG"
+   AUTH_TARGET="--url $GLANCE_TARGET/v1/images -A $TOKEN_TARGET"
+   
+   wget --header "x-auth-token: $TOKEN_ORIG" $GLANCE_ORIG/v1/images/$(glance -f $AUTH_ORIG index | grep despegar-$DISTRO-$VERSION | cut -d" " -f1) -O tmp-$DISTRO
+   glance $AUTH_TARGET add name="despegar-$DISTRO-$VERSION" disk_format=qcow2 container_format=bare < tmp-$DISTRO
+   rm -f tmp-$DISTRO
+
 5. Nova
 =================
 
-* Start by adding this script to /etc/network/if-pre-up.d/iptablesload to forward traffic to em2.90::
+* Start by adding this script to /etc/network/if-pre-up.d/iptablesload to forward traffic to em1::
 
    #!/bin/sh
-   iptables -t nat -A POSTROUTING -o em2.90 -j MASQUERADE
+   iptables -t nat -A POSTROUTING -o em1 -j MASQUERADE
    exit 0
 
 * Install these packages::
@@ -282,70 +309,70 @@ This is how we install OpenStack's identity service:
 
 * Change your /etc/nova/nova.conf to look like this::
 
-    [DEFAULT]
-    
-    # LOGS/STATE
-    verbose=True
-    logdir=/var/log/nova
-    state_path=/var/lib/nova
-    lock_path=/run/lock/nova
-    
-    # AUTHENTICATION
-    auth_strategy=keystone
-    
-    # SCHEDULER
-    scheduler_driver=nova.scheduler.multi.MultiScheduler
-    compute_scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
-    
-    # CINDER
-    volume_api_class=nova.volume.cinder.API
-    
-    # DATABASE
-    sql_connection=mysql://novaUser:novaPass@10.111.81.1/nova
-    
-    # COMPUTE
-    libvirt_type=kvm
-    libvirt_use_virtio_for_bridges=True
-    start_guests_on_host_boot=True
-    resume_guests_state_on_host_boot=True
-    api_paste_config=/etc/nova/api-paste.ini
-    allow_admin_api=True
-    use_deprecated_auth=False
-    nova_url=http://10.111.81.1:8774/v1.1/
-    root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
-    
-    # APIS
-    ec2_host=10.111.81.1
-    ec2_url=http://10.111.81.1:8773/services/Cloud
-    keystone_ec2_url=http://10.111.81.1:5000/v2.0/ec2tokens
-    s3_host=10.111.81.1
-    cc_host=10.111.81.1
-    metadata_host=10.111.81.1
-    #metadata_listen=0.0.0.0
-    enabled_apis=ec2,osapi_compute,metadata
-    
-    # RABBITMQ
-    rabbit_host=10.111.81.1
-    
-    # GLANCE
-    image_service=nova.image.glance.GlanceImageService
-    glance_api_servers=10.111.81.1:9292
-    
-    # NETWORK
-    network_manager=nova.network.manager.FlatDHCPManager
-    force_dhcp_release=True
-    dhcpbridge_flagfile=/etc/nova/nova.conf
-    dhcpbridge=/usr/bin/nova-dhcpbridge
-    firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
-    public_interface=eth0
-    flat_interface=em1
-    flat_network_bridge=br100
-    fixed_range=192.168.6.0/24
-    network_size=256
-    flat_network_dhcp_start=192.168.6.0
-    flat_injected=False
-    connection_type=libvirt
-    multi_host=True
+   [DEFAULT]
+   
+   # LOGS/STATE
+   verbose=True
+   logdir=/var/log/nova
+   state_path=/var/lib/nova
+   lock_path=/run/lock/nova
+   
+   # AUTHENTICATION
+   auth_strategy=keystone
+   
+   # SCHEDULER
+   scheduler_driver=nova.scheduler.multi.MultiScheduler
+   compute_scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
+   
+   # CINDER
+   volume_api_class=nova.volume.cinder.API
+   
+   # DATABASE
+   sql_connection=mysql://novaUser:novaPass@10.111.81.1/nova
+   
+   # COMPUTE
+   libvirt_type=kvm
+   libvirt_use_virtio_for_bridges=True
+   start_guests_on_host_boot=True
+   resume_guests_state_on_host_boot=True
+   api_paste_config=/etc/nova/api-paste.ini
+   allow_admin_api=True
+   use_deprecated_auth=False
+   nova_url=http://10.111.81.1:8774/v1.1/
+   root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
+   
+   # APIS
+   ec2_host=10.111.81.1
+   ec2_url=http://10.111.81.1:8773/services/Cloud
+   keystone_ec2_url=http://10.111.81.1:5000/v2.0/ec2tokens
+   s3_host=10.111.81.1
+   cc_host=10.111.81.1
+   metadata_host=10.111.81.1
+   #metadata_listen=0.0.0.0
+   enabled_apis=ec2,osapi_compute,metadata
+   
+   # RABBITMQ
+   rabbit_host=10.111.81.1
+   
+   # GLANCE
+   image_service=nova.image.glance.GlanceImageService
+   glance_api_servers=10.111.81.1:9292
+   
+   # NETWORK
+   network_manager=nova.network.manager.FlatDHCPManager
+   force_dhcp_release=True
+   dhcpbridge_flagfile=/etc/nova/nova.conf
+   dhcpbridge=/usr/bin/nova-dhcpbridge
+   firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
+   public_interface=eth0
+   flat_interface=eth0
+   flat_network_bridge=br100
+   fixed_range=192.168.6.0/24
+   network_size=256
+   flat_network_dhcp_start=192.168.6.0
+   flat_injected=False
+   connection_type=libvirt
+   multi_host=True
 
 * Don't forget to update the ownership rights of the nova directory::
 
