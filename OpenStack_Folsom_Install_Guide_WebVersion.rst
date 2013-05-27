@@ -244,17 +244,10 @@ This is how we install OpenStack's identity service:
 
    glance image-list
 
-* Create and run the following script, called migrate-to-folsom.sh, to import Despegar's Ubuntu base image::
+* Run the following script, called migrate-to-folsom.sh, to import Despegar's Ubuntu base image::
 
-   set -e -x
-   if [ "$#" -eq 3 ]; then
-   :
-   else
-     [ "$#" -eq 2 ] || { echo 'Usage: migrate.sh VERSION(ej.2013.03.15) DISTRO(ubuntu|redhat|...)'; exit 1; }
-   fi;
-   
-   VERSION=$1
-   DISTRO=$2
+   VERSION=2013.05.03
+   DISTRO=ubuntu
    
    GLANCE_ORIG=http://10.111.80.15:9292
    GLANCE_TARGET=http://10.111.81.1:9292
