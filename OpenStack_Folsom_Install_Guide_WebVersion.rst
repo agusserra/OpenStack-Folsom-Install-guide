@@ -20,16 +20,6 @@ Table of Contents
   7. Adding a compute node
   8. Start your first VM
 
-0. What is it?
-==============
-
-OpenStack Folsom Install Guide is an easy and tested way to create your own OpenStack plateform. 
-
-Version 1.0
-
-Status: testing 
-
-
 1. Requirements
 ====================
 
