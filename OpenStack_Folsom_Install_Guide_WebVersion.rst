@@ -28,8 +28,6 @@ Table of Contents
 
 **Note:** You can add as many compute node as you wish.
 
-.. image:: http://i.imgur.com/RK6X7.jpg
-
 2. Getting Ready
 ===============
 
