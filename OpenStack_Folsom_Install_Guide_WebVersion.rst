@@ -244,7 +244,7 @@ This is how we install OpenStack's identity service:
 
    glance image-list
 
-* Create the following script, called migrate-to-folsom.sh, to import Despegar's Ubuntu base image::
+* Create and run the following script, called migrate-to-folsom.sh, to import Despegar's Ubuntu base image::
 
    set -e -x
    if [ "$#" -eq 3 ]; then
@@ -535,19 +535,20 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 7.2.Networking
 ------------
 
-* It's recommended to have two NICs but only one (em2.90) needs to be internet connected::
+* Take a look at the networking::
    
+   auto lo
+   iface lo inet loopback
+
    auto em1
    iface em1 inet static
-   address 10.111.80.202
+   address 10.111.81.2
    netmask 255.255.255.0
-   dns-nameservers 8.8.8.8
-
-   auto em2.90
-   iface em2.90 inet static
-   address 10.222.90.202
-   netmask 255.255.255.0
-   gateway 10.222.90.254
+   network 10.111.81.0
+   broadcast 10.111.81.255
+   gateway 10.111.81.254
+   dns-nameservers 10.1.1.68 10.1.1.42
+   dns-search despexds.net
 
 7.3 KVM
 ------------------
@@ -602,71 +603,71 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
 * Modify the /etc/nova/nova.conf like this::
 
-    [DEFAULT]
-    
-    # LOGS/STATE
-    verbose=True
-    logdir=/var/log/nova
-    state_path=/var/lib/nova
-    lock_path=/run/lock/nova
-    
-    # AUTHENTICATION
-    auth_strategy=keystone
-    
-    # SCHEDULER
-    scheduler_driver=nova.scheduler.multi.MultiScheduler
-    compute_scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
-    
-    # CINDER
-    volume_api_class=nova.volume.cinder.API
-    
-    # DATABASE
-    sql_connection=mysql://novaUser:novaPass@10.111.81.1/nova
-    
-    # COMPUTE
-    libvirt_type=kvm
-    libvirt_use_virtio_for_bridges=True
-    start_guests_on_host_boot=True
-    resume_guests_state_on_host_boot=True
-    api_paste_config=/etc/nova/api-paste.ini
-    allow_admin_api=True
-    use_deprecated_auth=False
-    nova_url=http://10.111.81.1:8774/v1.1/
-    root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
-    
-    # APIS
-    ec2_host=10.111.80.201
-    ec2_url=http://10.111.81.1:8773/services/Cloud
-    keystone_ec2_url=http://10.111.81.1:5000/v2.0/ec2tokens
-    s3_host=10.111.81.1
-    cc_host=10.111.81.1
-    
-    # RABBITMQ
-    rabbit_host=10.111.81.1
-    
-    # GLANCE
-    image_service=nova.image.glance.GlanceImageService
-    glance_api_servers=10.111.81.1:9292
-    
-    # NETWORK
-    network_manager=nova.network.manager.FlatDHCPManager
-    force_dhcp_release=True
-    dhcpbridge_flagfile=/etc/nova/nova.conf
-    dhcpbridge=/usr/bin/nova-dhcpbridge
-    firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
-    public_interface=em1
-    flat_interface=em2
-    flat_network_bridge=br100
-    fixed_range=192.168.6.0/24
-    network_size=256
-    flat_network_dhcp_start=192.168.6.0
-    flat_injected=False
-    connection_type=libvirt
-    multi_host=True
-
+   [DEFAULT]
+   
+   # LOGS/STATE
+   verbose=True
+   logdir=/var/log/nova
+   state_path=/var/lib/nova
+   lock_path=/run/lock/nova
+   
+   # AUTHENTICATION
+   auth_strategy=keystone
+   
+   # SCHEDULER
+   scheduler_driver=nova.scheduler.multi.MultiScheduler
+   compute_scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
+   
+   # CINDER
+   volume_api_class=nova.volume.cinder.API
+   
+   # DATABASE
+   sql_connection=mysql://novaUser:novaPass@10.111.81.1/nova
+   
+   # COMPUTE
+   libvirt_type=kvm
+   libvirt_use_virtio_for_bridges=True
+   start_guests_on_host_boot=True
+   resume_guests_state_on_host_boot=True
+   api_paste_config=/etc/nova/api-paste.ini
+   allow_admin_api=True
+   use_deprecated_auth=False
+   nova_url=http://10.111.81.1:8774/v1.1/
+   root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
+   
+   # APIS
+   ec2_host=10.111.81.1
+   ec2_url=http://10.111.81.1:8773/services/Cloud
+   keystone_ec2_url=http://10.111.81.1:5000/v2.0/ec2tokens
+   s3_host=10.111.81.1
+   cc_host=10.111.81.1
+   
+   # RABBITMQ
+   rabbit_host=10.111.81.1
+   
+   # GLANCE
+   image_service=nova.image.glance.GlanceImageService
+   glance_api_servers=10.111.81.1:9292
+   
+   # NETWORK
+   network_manager=nova.network.manager.FlatDHCPManager
+   force_dhcp_release=True
+   dhcpbridge_flagfile=/etc/nova/nova.conf
+   dhcpbridge=/usr/bin/nova-dhcpbridge
+   firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
+   public_interface=em1
+   flat_interface=em2
+   flat_network_bridge=br100
+   fixed_range=192.168.6.0/24
+   network_size=256
+   flat_network_dhcp_start=192.168.6.0
+   flat_injected=False
+   connection_type=libvirt
+   multi_host=True
+   
 * Restart nova-* services::
 
-   cd /etc/init.d/; for i in $( ls nova-* ); do sudo service $i restart; done   
+  cd /etc/init.d/; for i in $( ls nova-* ); do sudo service $i restart; done   
 
 * Check for the smiling faces on nova-* services to confirm your installation::
 
