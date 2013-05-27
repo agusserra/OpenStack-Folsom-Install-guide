@@ -675,6 +675,6 @@ To start your first VM:
 
    glance image-list
 
-* Launch the instance using tha ID::
+* Launch the instance using that ID::
 
    nova boot --image fb42188e-adce-4386-bc8c-99472033d525 --flavor m1.small --key-name master test --meta host=$(hostname)
