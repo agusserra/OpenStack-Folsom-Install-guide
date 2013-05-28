@@ -427,7 +427,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
    mysql -u root -p
    CREATE DATABASE cinder;
-   GRANT ALL ON cinder.* TO 'cinderUser'@'localhost' IDENTIFIED BY 'cinderPass';
+   GRANT ALL ON cinder.* TO 'cinderUser'@'%' IDENTIFIED BY 'cinderPass!';
    quit;
 
 * Configure /etc/cinder/api-paste.ini like the following::
