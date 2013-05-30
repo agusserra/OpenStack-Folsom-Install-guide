@@ -182,7 +182,7 @@ This is how we install OpenStack's identity service:
 
    mysql -u root -p
    CREATE DATABASE glance;
-   GRANT ALL ON glance.* TO 'glanceUser'@'localhost' IDENTIFIED BY 'glancePass';
+   GRANT ALL ON glance.* TO 'glanceUser'@'%' IDENTIFIED BY 'glancePass!';
    quit;
 
 * Update /etc/glance/glance-api-paste.ini with::
