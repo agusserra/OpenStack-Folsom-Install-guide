@@ -209,7 +209,7 @@ This is how we install OpenStack's identity service:
 
 * Update /etc/glance/glance-api.conf with::
 
-   sql_connection = mysql://glanceUser:glancePass@localhost/glance
+   sql_connection = mysql://glanceUser:glancePass!@localhost/glance
 
 * And::
 
@@ -218,7 +218,7 @@ This is how we install OpenStack's identity service:
 
 * Update the /etc/glance/glance-registry.conf with::
 
-   sql_connection = mysql://glanceUser:glancePass@localhost/glance
+   sql_connection = mysql://glanceUser:glancePass!@localhost/glance
 
 * And::
 
