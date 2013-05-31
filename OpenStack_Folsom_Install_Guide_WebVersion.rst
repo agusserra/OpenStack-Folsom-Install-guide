@@ -24,7 +24,7 @@ Table of Contents
 
 :Node Role: NICs
 :Control Node: eth0 (10.111.81.1)
-:Compute Node: eth0 (10.111.81.2)
+:Compute Node: em1 (10.111.81.2)
 
 **Note:** You can add as many compute node as you wish.
 
@@ -264,6 +264,12 @@ This is how we install OpenStack's identity service:
    wget --header "x-auth-token: $TOKEN_ORIG" $GLANCE_ORIG/v1/images/$(glance -f $AUTH_ORIG index | grep despegar-$DISTRO-$VERSION | cut -d" " -f1) -O tmp-$DISTRO
    glance $AUTH_TARGET add name="despegar-$DISTRO-$VERSION" disk_format=qcow2 container_format=bare < tmp-$DISTRO
    rm -f tmp-$DISTRO
+
+* Enable the endpoint v1 for Glance in the Keystone database::
+
+   Simply replace "v2" with "v1" in the 'extra' column of the 'endpoint' table in 'keystone' database.
+   The row to modify is the one with "id" equal to the "service_id" with 'image' type in the 'service' table.
+   In our case is the one whose url shows port 9292.
 
 5. Nova
 =================
