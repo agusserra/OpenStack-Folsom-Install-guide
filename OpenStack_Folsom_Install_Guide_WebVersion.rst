@@ -273,7 +273,7 @@ This is how we install OpenStack's identity service:
 
 * Install and configure nfs::
 
-   apt-get install nfs-kernel-server
+   apt-get -y install nfs-kernel-server
    echo '/var/lib/glance/images 10.0.0.0/8(rw,no_root_squash,subtree_check)' >> /etc/exports
    exportfs -a
    service nfs-kernel-server restart
