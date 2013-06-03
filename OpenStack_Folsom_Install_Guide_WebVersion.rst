@@ -271,6 +271,13 @@ This is how we install OpenStack's identity service:
    The row to modify is the one with "id" equal to the "service_id" with 'image' type in the 'service' table.
    In our case is the one whose url shows port 9292.
 
+* Install and configure nfs::
+
+   apt-get install nfs-kernel-server
+   echo '/var/lib/glance/images 10.0.0.0/8(rw,no_root_squash,subtree_check)' >> /etc/exports
+   exportfs -a
+   service nfs-kernel-server restart
+
 5. Nova
 =================
 
