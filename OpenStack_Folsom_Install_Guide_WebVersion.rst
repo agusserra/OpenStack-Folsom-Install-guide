@@ -405,9 +405,10 @@ This is how we install OpenStack's identity service:
    
    nova-manage network create private --fixed_range_v4=192.168.6.0/24 --num_networks=1 --bridge=br100 --bridge_interface=eth0 --network_size=256 --multi_host=T
 
-* Create the floating IPs::
+* Create the floating IPs ranges for both vlans::
 
    nova-manage floating create --ip_range=10.111.81.128/26
+   nova-manage floating create --ip_range=10.111.91.128/26
 
 * Create the floating to the nova project, run the next command many times as your network IPs::
 
