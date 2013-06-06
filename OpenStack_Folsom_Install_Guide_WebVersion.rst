@@ -502,10 +502,41 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    service cinder-volume restart
    service cinder-api restart
 
-7. Adding a compute node
+7. Miscelaneos
 =========================
 
-7.1. Preparing the Node
+* Mail settings::
+   apt-get install mutt -y
+
+* Edit the archive /etc/postfix/main.cf::
+   relayhost = 192.168.2.58
+
+* Ensure every service of openstack to start after reboot (nova*, glance*, keystone, mysql, cinder*)::
+   sysv-rc-conf
+
+8. Nagios
+=========================
+
+* Add the controller to Nagios::
+   IP=$(hostname -i)
+   ssh -o StrictHostKeyChecking=no -i /root/.ssh/nagios.key root@$NAGIOS_HOST "if ! grep -i $(hostname) /usr/local/nagios/etc/objects/hosts/cloud.cfg >/dev/null; then
+     echo \"define host {
+           use                     linux-server
+           host_name               $(hostname | tr -s  '[:lower:]'  '[:upper:]')
+           alias                   $(hostname | tr -s  '[:lower:]'  '[:upper:]')
+           address                 $IP
+     }
+   \" >> /usr/local/nagios/etc/objects/hosts/cloud.cfg
+     /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+     /etc/init.d/nagios restart
+   fi"
+
+
+
+1. Adding a compute node
+=========================
+
+1.1. Preparing the Node
 ------------------
 
 * Update your system::
@@ -539,7 +570,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    iptables -t nat -A POSTROUTING -o em1 -j MASQUERADE
    exit 0
 
-7.2.Networking
+1.2.Networking
 ------------
 
 * Take a look at the networking::
@@ -557,7 +588,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    dns-nameservers 10.1.1.68 10.1.1.42
    dns-search despexds.net
 
-7.3 KVM
+1.3 KVM
 ------------------
 
 * Make sure that your hardware enables virtualization::
@@ -601,7 +632,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
    service libvirt-bin restart
 
-7.4. Nova
+1.4. Nova
 ------------------
 
 * Install nova's required components for the compute node::
@@ -680,7 +711,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
    nova-manage service list
 
-8. Your First VM
+2. Your First VM
 ============
 
 To start your first VM:
