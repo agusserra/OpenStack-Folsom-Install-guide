@@ -514,6 +514,27 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 * Ensure every service of openstack to start after reboot (nova*, glance*, keystone, mysql, cinder*)::
    sysv-rc-conf
 
+* Estandarizar flavors ejecutando los siguientes comandos::
+   nova flavor-create cpu.large 1 8192 8 16
+   nova flavor-create cpu.medium 2 4096 4 8
+   nova flavor-create disk.large 3 16384 160 8
+   nova flavor-create disk.medium 4 8192 80 4
+   nova flavor-create disk.small 5 3072 30 2
+   nova flavor-create mem.huge 6 65536 64 16
+   nova flavor-create mem.large 7 24576 24 8
+   nova flavor-create mem.medium 8 12288 12 4
+   nova flavor-create mem.small 9 4096 4 2
+   nova flavor-create std2.huge 10 32768 37 16
+   nova flavor-create std2.large 11 16384 21 8
+   nova flavor-create std2.medium 12 8192 13 4
+   nova flavor-create std2.small 13 4096 9 2
+   nova flavor-create std2.tiny 14 2048 7 1
+   nova flavor-delete 1
+   nova flavor-delete 1
+   nova flavor-delete 1
+   nova flavor-delete 1
+   nova flavor-delete 1
+
 8. Nagios
 =========================
 
