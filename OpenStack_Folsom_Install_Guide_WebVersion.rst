@@ -519,6 +519,11 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
 * Estandarizar flavors ejecutando los siguientes comandos::
 
+   nova flavor-delete 1
+   nova flavor-delete 2
+   nova flavor-delete 3
+   nova flavor-delete 4
+   nova flavor-delete 5
    nova flavor-create cpu.large 1 8192 8 16
    nova flavor-create cpu.medium 2 4096 4 8
    nova flavor-create disk.large 3 16384 160 8
@@ -533,11 +538,6 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    nova flavor-create std2.medium 12 8192 13 4
    nova flavor-create std2.small 13 4096 9 2
    nova flavor-create std2.tiny 14 2048 7 1
-   nova flavor-delete 1
-   nova flavor-delete 2
-   nova flavor-delete 3
-   nova flavor-delete 4
-   nova flavor-delete 5
 
 
 8. Nagios
