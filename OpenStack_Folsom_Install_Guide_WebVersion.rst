@@ -539,11 +539,17 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    nova flavor-create std2.small 13 4096 9 2
    nova flavor-create std2.tiny 14 2048 7 1
 
+* Configure de security group default. Run the followings commands on the controller::
+
+   nova secgroup-add-rule default tcp 1 65535 0.0.0.0/0
+   nova secgroup-add-rule default udp 1 65535 0.0.0.0/0
+
 
 8. Nagios
 =========================
 
 * Add the controller to Nagios::
+
    IP=$(hostname -i)
    ssh -o StrictHostKeyChecking=no -i /root/.ssh/nagios.key root@$NAGIOS_HOST "if ! grep -i $(hostname) /usr/local/nagios/etc/objects/hosts/cloud.cfg >/dev/null; then
      echo \"define host {
