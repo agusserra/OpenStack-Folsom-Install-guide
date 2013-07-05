@@ -52,7 +52,7 @@ Table of Contents
    0.0.0.0         10.111.81.254   0.0.0.0         UG    0      0        0 eth0
    10.111.81.0     0.0.0.0         255.255.255.0   U     0      0        0 eth0
  
-* /etc/network/interfaces::
+* The file /etc/network/interfaces should look like this::
 
    auto lo
    iface lo inet loopback
