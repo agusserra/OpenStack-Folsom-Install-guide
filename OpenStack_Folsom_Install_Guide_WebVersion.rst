@@ -41,8 +41,8 @@ Table of Contents
 * Update your system::
 
    apt-get update
-   apt-get upgrade
-   apt-get dist-upgrade
+   apt-get upgrade -y
+   apt-get dist-upgrade -y
 
 2.2.Networking
 ------------
