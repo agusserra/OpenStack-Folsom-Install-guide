@@ -153,17 +153,15 @@ This is how we install OpenStack's identity service:
    ./keystone_basic.sh
    ./keystone_endpoints_basic.sh
 
-* Create a simple credential file and load it so you won't be bothered later::
+* Load the credential data in the file /etc/profile::
 
-   vi creds
-   #Paste the following:
+   echo '
    export OS_TENANT_NAME=admin
    export OS_USERNAME=admin
    export OS_PASSWORD=admin_pass
    export OS_AUTH_URL="http://10.111.80.201:5000/v2.0/"
-   export OS_NO_CACHE=1
-   # Load it:
-   source creds
+   export OS_NO_CACHE=1' >> /etc/profile
+   source /etc/profile
 
 * To test Keystone, we use a simple curl request::
 
