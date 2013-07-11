@@ -417,10 +417,11 @@ This is how we install OpenStack's identity service:
 
     nova floating-ip-create
 
-* Add ICMP ping and SSH access to the default security group::
+* Add ICMP ping and all TCP and UDP access to the default security group::
 
     nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
-    nova secgroup-add-rule default tcp 22 22 0.0.0.0/0
+    nova secgroup-add-rule default tcp 1 65535 0.0.0.0/0
+    nova secgroup-add-rule default udp 1 65535 0.0.0.0/0
 
 6. Cinder
 =================
@@ -541,11 +542,6 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    nova flavor-create std2.medium 12 8192 13 4
    nova flavor-create std2.small 13 4096 9 2
    nova flavor-create std2.tiny 14 2048 7 1
-
-* Configure de security group default. Run the followings commands on the controller::
-
-   nova secgroup-add-rule default tcp 1 65535 0.0.0.0/0
-   nova secgroup-add-rule default udp 1 65535 0.0.0.0/0
 
 
 8. Nagios
