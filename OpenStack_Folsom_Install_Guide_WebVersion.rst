@@ -630,26 +630,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
    apt-get install -y kvm libvirt-bin pm-utils
 
-* Delete default virtual bridge::
-
-   virsh net-destroy default
-   virsh net-undefine default
-
-* Enable live migration by updating /etc/libvirt/libvirtd.conf file::
-
-   listen_tls = 0
-   listen_tcp = 1
-   auth_tcp = "none"
-
-* Edit libvirtd_opts variable in /etc/init/libvirt-bin.conf file::
-
-   env libvirtd_opts="-d -l"
-
-* Edit /etc/default/libvirt-bin file ::
-
-   libvirtd_opts="-d -l"
-
-* Restart the libvirt service to load the new values::
+* Restart the libvirt service::
 
    service libvirt-bin restart
 
