@@ -594,7 +594,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
    sysctl -p
 
-* Add this script to /etc/network/if-pre-up.d/iptablesload to forward traffic to em2.90::
+* Add this script to /etc/network/if-pre-up.d/iptablesload to forward traffic to em1::
 
    #!/bin/sh
    iptables -t nat -A POSTROUTING -o em1 -j MASQUERADE
@@ -629,15 +629,6 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 * Normally you would get a good response. Now, move to install kvm and configure it::
 
    apt-get install -y kvm libvirt-bin pm-utils
-
-* Edit the cgroup_device_acl array in the /etc/libvirt/qemu.conf file to::
-
-   cgroup_device_acl = [
-   "/dev/null", "/dev/full", "/dev/zero",
-   "/dev/random", "/dev/urandom",
-   "/dev/ptmx", "/dev/kvm", "/dev/kqemu",
-   "/dev/rtc", "/dev/hpet","/dev/net/tun"
-   ]
 
 * Delete default virtual bridge::
 
