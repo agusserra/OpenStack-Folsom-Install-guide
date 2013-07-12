@@ -591,9 +591,8 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
 * Enable IP_Forwarding::
 
-   vi /etc/sysctl.conf
-   # Uncomment net.ipv4.ip_forward=1, to save you from rebooting, perform the following
-   sysctl net.ipv4.ip_forward=1
+   sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+   sysctl -p
 
 * Add this script to /etc/network/if-pre-up.d/iptablesload to forward traffic to em2.90::
 
