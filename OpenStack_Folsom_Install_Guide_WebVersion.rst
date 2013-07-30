@@ -543,6 +543,18 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    nova flavor-create std2.small 13 4096 9 2
    nova flavor-create std2.tiny 14 2048 7 1
 
+* Instalar NewRelic::
+
+   touch /etc/apt/sources.list.d/newrelic.list
+   echo "deb http://apt.newrelic.com/debian/ newrelic non-free" >> /etc/apt/sources.list.d/newrelic.list
+   wget -O- http://download.newrelic.com/548C16BF.gpg | apt-key add -
+   apt-get update -y
+   apt-get install newrelic-sysmond -y
+
+* Clonar repositorio de cloud-host::
+
+   /usr/bin/git clone -b master http://200.32.121.72/git/cloud-hosts /root/cloud-hosts
+
 
 8. Nagios
 =========================
