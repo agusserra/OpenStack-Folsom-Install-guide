@@ -409,9 +409,14 @@ This is how we install OpenStack's identity service:
    nova-manage floating create --ip_range=10.111.81.128/26 --pool vlan81
    nova-manage floating create --ip_range=10.222.91.128/26 --pool vlan91
    
-   Production:
+   Production Folsom:
    nova-manage floating create --ip_range=10.70.128.0/17 --pool vlan70
    nova-manage floating create --ip_range=10.2.192.0/19 --pool vlan22
+   
+   Production Folsom2:
+   nova-manage floating create --ip_range=10.70.32.0/19 --pool vlan71
+   nova-manage floating create --ip_range=10.23.32.0/19 --pool vlan23
+   
 
 * Create the floating to the nova project, run the next command many times as your network IPs::
 
