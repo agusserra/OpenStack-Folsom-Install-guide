@@ -414,7 +414,7 @@ This is how we install OpenStack's identity service:
    nova-manage floating create --ip_range=10.2.192.0/19 --pool vlan22
    
    Production Folsom2:
-   nova-manage floating create --ip_range=10.70.32.0/19 --pool vlan71
+   nova-manage floating create --ip_range=10.71.32.0/19 --pool vlan71
    nova-manage floating create --ip_range=10.23.32.0/19 --pool vlan23
    
 
