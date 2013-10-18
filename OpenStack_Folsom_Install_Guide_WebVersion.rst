@@ -520,7 +520,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
 * Edit the archive /etc/postfix/main.cf::
 
-   relayhost = 192.168.2.58
+   relayhost = mail01.despexds.net
 
 * Ensure every service of openstack to start after reboot (nova*, glance*, keystone, mysql, cinder*)::
 
@@ -533,20 +533,60 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    nova flavor-delete 3
    nova flavor-delete 4
    nova flavor-delete 5
-   nova flavor-create cpu.large 1 8192 8 16
-   nova flavor-create cpu.medium 2 4096 4 8
-   nova flavor-create disk.large 3 16384 160 8
-   nova flavor-create disk.medium 4 8192 80 4
-   nova flavor-create disk.small 5 3072 30 2
-   nova flavor-create mem.huge 6 65536 64 16
-   nova flavor-create mem.large 7 24576 24 8
-   nova flavor-create mem.medium 8 12288 12 4
-   nova flavor-create mem.small 9 4096 4 2
-   nova flavor-create std2.huge 10 32768 37 16
-   nova flavor-create std2.large 11 16384 21 8
-   nova flavor-create std2.medium 12 8192 13 4
-   nova flavor-create std2.small 13 4096 9 2
-   nova flavor-create std2.tiny 14 2048 7 1
+   nova flavor-create m1.tiny 1 512 0 1
+   nova flavor-create ddlg 100 8192 3 4
+   nova flavor-create chori 101 2048 3 2
+   nova flavor-create disquito 103 4096 7 4
+   nova flavor-create medio 104 4096 3 2
+   nova flavor-create large.1 105 16384 32 8
+   nova flavor-create medium.2 106 8192 20 4
+   nova flavor-create tiny.1 107 2048 4 1
+   nova flavor-create tiny.2 108 4096 12 1
+   nova flavor-create small.1 109 4096 8 2
+   nova flavor-create small.2 110 8192 24 2
+   nova flavor-create medium.1 111 8192 16 4
+   nova flavor-create large.2 112 20480 40 8
+   nova flavor-create huge.1 113 32768 80 16
+   nova flavor-create huge.2 114 16384 40 16
+   nova flavor-create small.3 115 8192 50 2
+   nova flavor-create small.2.pd 116 8192 10 2
+   nova flavor-create large.1.sd 117 16384 4 8
+   nova flavor-create large.3 118 8192 40 8
+   nova flavor-create huge.2.sd 119 16384 16 16
+   nova flavor-create std.small 121 3072 3 2
+   nova flavor-create std.medium 122 8192 8 4
+   nova flavor-create std.large 123 16384 16 8
+   nova flavor-create std.huge 124 32768 32 16
+   nova flavor-create disk.small 125 3072 30 2
+   nova flavor-create disk.medium 126 8192 80 4
+   nova flavor-create disk.large 127 16384 160 8
+   nova flavor-create cpu.medium 128 4096 4 8
+   nova flavor-create cpu.large 129 8192 8 16
+   nova flavor-create std.tiny 130 1024 3 1
+   nova flavor-create mem.small 131 4096 4 2
+   nova flavor-create mem.medium 132 12288 12 4
+   nova flavor-create mem.large 133 24576 24 8
+   nova flavor-create disk.medium2 134 8192 30 4
+   nova flavor-create mem.huge 135 65536 64 16
+   nova flavor-create std2.tiny 136 2048 7 1
+   nova flavor-create std2.small 137 4096 9 2
+   nova flavor-create std2.medium 138 8192 13 4
+   nova flavor-create std2.large 139 16384 21 8
+   nova flavor-create std2.huge 140 32768 37 16
+   nova flavor-create disk.huge 141 30720 880 8
+   nova flavor-create mem.large.2 142 32768 8 8
+   nova flavor-create mem.large.3 143 49152 8 8
+   nova flavor-create mem.large.4 144 32768 8 4
+   nova flavor-create cpu.medium.2 145 8192 8 8
+   nova flavor-create mem.large.5 146 24576 8 4
+   nova flavor-create disk.large.2 147 16384 320 8
+   nova flavor-create mem.large.6 148 24576 16 4
+   nova flavor-create std3.medium 149 8192 24 4
+   nova flavor-create disk.hugito 150 28672 880 8
+   nova flavor-create cpu.medium.3 151 4096 8 8
+   nova flavor-create m1.small 2 2048 10 1
+   nova flavor-create cfv 99 8192 3 8
+
 
 * Instalar NewRelic::
 
