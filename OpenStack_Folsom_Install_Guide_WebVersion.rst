@@ -524,6 +524,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
 * Ensure every service of openstack to start after reboot (nova*, glance*, keystone, mysql, cinder*)::
 
+   apt-get install sysv-rc-conf
    sysv-rc-conf
 
 * Estandarizar flavors ejecutando los siguientes comandos::
@@ -598,6 +599,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
 * Clonar repositorio de cloud-host::
 
+   apt-get install git -y
    /usr/bin/git clone -b master http://200.32.121.72/git/cloud-hosts /root/cloud-hosts
 
 
