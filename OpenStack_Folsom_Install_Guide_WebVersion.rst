@@ -608,6 +608,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
 
 * Add the controller to Nagios::
 
+   NAGIOS_HOST=nagios.despexds.net
    IP=$(hostname -i)
    ssh -o StrictHostKeyChecking=no -i /root/.ssh/nagios.key root@$NAGIOS_HOST "if ! grep -i $(hostname) /usr/local/nagios/etc/objects/hosts/cloud.cfg >/dev/null; then
      echo \"define host {
