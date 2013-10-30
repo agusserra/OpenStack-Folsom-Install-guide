@@ -433,6 +433,17 @@ This is how we install OpenStack's identity service:
 
 Although Cinder is a replacement of the old nova-volume service, its installation is now a seperated from the nova install process.
 
+* Add Grizzly repositories [Only for Ubuntu 12.04]::
+
+     apt-get install -y ubuntu-cloud-keyring 
+     echo deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/grizzly main >> /etc/apt/sources.list.d/grizzly.list
+
+* Update your system::
+
+   apt-get update
+   apt-get upgrade -y
+   apt-get dist-upgrade -y
+
 * Install the required packages::
 
    apt-get install cinder-api cinder-scheduler cinder-volume iscsitarget open-iscsi iscsitarget-dkms
