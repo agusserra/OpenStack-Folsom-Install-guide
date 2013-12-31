@@ -613,7 +613,7 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    apt-get install git -y
    /usr/bin/git clone -b master http://200.32.121.72/git/cloud-hosts /root/cloud-hosts
 
-* Change /etc/alternatives/ruby to point to /usr/bin/ruby1.8 instead /usr/bin/1.9
+* Change /etc/alternatives/ruby to point to /usr/bin/ruby1.8 instead /usr/bin/1.9::
 
    cd /etc/alternatives
    rm ruby
@@ -621,12 +621,12 @@ Although Cinder is a replacement of the old nova-volume service, its installatio
    rm gem
    ln -s /usr/bin/gem1.8 gem
 
-* Reinstall the stomp package
+* Reinstall the stomp package::
 
    gem install stomp
    gem install colorize
 
-* Generar clave ssh y autorizarla en puppet
+* Generar clave ssh y autorizarla en puppet::
 
    ssh-keygen
    ssh-copy-id -i /root/.ssh/id_rsa.pub root@puppet
